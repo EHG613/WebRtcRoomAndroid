@@ -31,7 +31,6 @@ import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 import org.webrtc.audio.AudioDeviceModule;
 import org.webrtc.audio.JavaAudioDeviceModule;
-import org.webrtc.audio.LegacyAudioDeviceModule;
 import org.webrtc.voiceengine.WebRtcAudioManager;
 import org.webrtc.voiceengine.WebRtcAudioRecord;
 import org.webrtc.voiceengine.WebRtcAudioTrack;
@@ -177,9 +176,10 @@ public class WebRtcClient {
         final boolean enableH264HighProfile =
                 "H264 High".equals(pcParams.videoCodec);
         //音频模式
-        final AudioDeviceModule adm = pcParams.useLegacyAudioDevice
-                ? createLegacyAudioDevice()
-                : createJavaAudioDevice();
+//        final AudioDeviceModule adm = pcParams.useLegacyAudioDevice
+//                ? createLegacyAudioDevice()
+//                : createJavaAudioDevice();
+        final AudioDeviceModule adm =  createJavaAudioDevice();
         //编解码模式【硬件加速，软编码】
         if (pcParams.videoCodecHwAcceleration) {
             encoderFactory = new DefaultVideoEncoderFactory(
@@ -620,7 +620,7 @@ public class WebRtcClient {
             }
         });
 
-        return new LegacyAudioDeviceModule();
+        return null;
     }
 
     //创建音频模式JavaAudioDevice

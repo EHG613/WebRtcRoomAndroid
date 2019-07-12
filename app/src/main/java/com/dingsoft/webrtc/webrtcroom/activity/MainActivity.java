@@ -6,6 +6,9 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -44,7 +47,7 @@ public class MainActivity extends Activity implements RtcListener,View.OnClickLi
     private PeerConnectionParameters peerConnectionParameters;
     //host地址
     //private String socketHost = "http://172.16.70.226:8081";
-    private String socketHost = "https://172.16.70.226:8443";
+    private String socketHost = "https://10.5.223.159:8443";
 
     //记录用户首次点击返回键的时间
     private long firstTime = 0;
@@ -54,6 +57,13 @@ public class MainActivity extends Activity implements RtcListener,View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().addFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                        | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.activity_main);
         roomName =  findViewById(R.id.room);
         openCamera = findViewById(R.id.openCamera);
@@ -69,6 +79,8 @@ public class MainActivity extends Activity implements RtcListener,View.OnClickLi
         remoteViews = new HashMap<>();
         //创建WebRtcClient
         createWebRtcClient();
+        findViewById(R.id.openCamera).performClick();
+        findViewById(R.id.create).performClick();
     }
 
     @Override
@@ -156,7 +168,7 @@ public class MainActivity extends Activity implements RtcListener,View.OnClickLi
         this.getWindowManager().getDefaultDisplay().getSize(displaySize);
         displaySize.set(480,320);
         peerConnectionParameters =  new PeerConnectionParameters(true, false,
-                    false, displaySize.x, displaySize.y, 30,
+                    false, displaySize.x, displaySize.y, 20,
                     0, "VP8",
                     true,false,0,"OPUS",
                     false,false,false,false,false,false,
@@ -246,9 +258,9 @@ public class MainActivity extends Activity implements RtcListener,View.OnClickLi
                 remoteView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
                 remoteView.setZOrderMediaOverlay(true);
                 remoteView.setEnableHardwareScaler(false);
-                remoteView.setMirror(true);
+                remoteView.setMirror(false);
                 //控件布局
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(360,360);
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
                 layoutParams.topMargin = 20;
                 remoteVideoLl.addView(remoteView,layoutParams);
                 //添加至hashmap中
