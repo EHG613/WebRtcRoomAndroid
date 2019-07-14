@@ -47,7 +47,8 @@ public class MainActivity extends Activity implements RtcListener,View.OnClickLi
     private PeerConnectionParameters peerConnectionParameters;
     //host地址
     //private String socketHost = "http://172.16.70.226:8081";
-    private String socketHost = "https://10.5.223.159:8443";
+//    private String socketHost = "https://10.5.223.159:8443";
+    private String socketHost = "https://192.168.0.104:8443";
 
     //记录用户首次点击返回键的时间
     private long firstTime = 0;
@@ -62,6 +63,7 @@ public class MainActivity extends Activity implements RtcListener,View.OnClickLi
                 WindowManager.LayoutParams.FLAG_FULLSCREEN
                         | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
                         | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                        | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION
                         | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.activity_main);
@@ -167,9 +169,9 @@ public class MainActivity extends Activity implements RtcListener,View.OnClickLi
         Point displaySize = new Point();
         this.getWindowManager().getDefaultDisplay().getSize(displaySize);
         displaySize.set(480,320);
-        peerConnectionParameters =  new PeerConnectionParameters(true, false,
+        peerConnectionParameters =  new PeerConnectionParameters(false, false,
                     false, displaySize.x, displaySize.y, 20,
-                    0, "VP8",
+                    0, "VP9",
                     true,false,0,"OPUS",
                     false,false,false,false,false,false,
                     false,false,false,false);
@@ -255,13 +257,13 @@ public class MainActivity extends Activity implements RtcListener,View.OnClickLi
                 //初始化渲染源
                 remoteView.init(rootEglBase.getEglBaseContext(), null);
                 //填充模式
-                remoteView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
+                remoteView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
                 remoteView.setZOrderMediaOverlay(true);
                 remoteView.setEnableHardwareScaler(false);
                 remoteView.setMirror(false);
                 //控件布局
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
-                layoutParams.topMargin = 20;
+//                layoutParams.topMargin = 20;
                 remoteVideoLl.addView(remoteView,layoutParams);
                 //添加至hashmap中
                 remoteViews.put(peerId,remoteView);

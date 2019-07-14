@@ -95,7 +95,7 @@ public class WebRtcClient {
     //本地socket id
     private String socketId;
     //room id
-    private String  roomId;
+    private String roomId;
 
     ////webRtc定义常量////
     private static final String AUDIO_ECHO_CANCELLATION_CONSTRAINT = "googEchoCancellation";
@@ -107,8 +107,9 @@ public class WebRtcClient {
     private static final String VIDEO_VP8_INTEL_HW_ENCODER_FIELDTRIAL = "WebRTC-IntelVP8/Enabled/";
     private static final String DISABLE_WEBRTC_AGC_FIELDTRIAL =
             "WebRTC-Audio-MinimizeResamplingOnMobile/Enabled/";
-    public static final int FONT_FACTING = 0 ;
-    public static final int BACK_FACING = 1 ;
+    public static final int FONT_FACTING = 0;
+    public static final int BACK_FACING = 1;
+
     //构造函数
     public WebRtcClient(Context appContext,
                         EglBase eglBase,
@@ -179,7 +180,7 @@ public class WebRtcClient {
 //        final AudioDeviceModule adm = pcParams.useLegacyAudioDevice
 //                ? createLegacyAudioDevice()
 //                : createJavaAudioDevice();
-        final AudioDeviceModule adm =  createJavaAudioDevice();
+        final AudioDeviceModule adm = createJavaAudioDevice();
         //编解码模式【硬件加速，软编码】
         if (pcParams.videoCodecHwAcceleration) {
             encoderFactory = new DefaultVideoEncoderFactory(
@@ -258,35 +259,36 @@ public class WebRtcClient {
         }
     }
 
-    /** UI操作相关 */
+    /**
+     * UI操作相关
+     */
     //创建并加入
-    public void createAndJoinRoom(String roomId){
+    public void createAndJoinRoom(String roomId) {
         //构建信令数据并发送
         try {
             JSONObject message = new JSONObject();
-            message.put("room",roomId);
+            message.put("room", roomId);
             //向信令服务器发送信令
-            sendMessage("createAndJoinRoom",message);
-        }catch (JSONException e){
+            sendMessage("createAndJoinRoom", message);
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
     //退出room
-    public void exitRoom(){
+    public void exitRoom() {
         //信令服务器发送 exit [from room]
         try {
             JSONObject message = new JSONObject();
-            message.put("from",socketId);
-            message.put("room",roomId);
+            message.put("from", socketId);
+            message.put("room", roomId);
             //向信令服务器发送信令
-            sendMessage("exit",message);
-        }catch (JSONException e){
+            sendMessage("exit", message);
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         //循环遍历 peer关闭
-        for(Peer pc: peers.values())
-        {
+        for (Peer pc : peers.values()) {
             pc.getPc().close();
         }
         //数据重置
@@ -294,72 +296,75 @@ public class WebRtcClient {
         roomId = "";
         peers.clear();
         //通知UI清空远端摄像头
-        ((MainActivity)rtcListener).clearRemoteCamera();
+        ((MainActivity) rtcListener).clearRemoteCamera();
     }
 
-    /** WebRtc相关 */
+    /**
+     * WebRtc相关
+     */
     //构建webRtc连接并返回
     private Peer getOrCreateRtcConnect(String socketId) {
         Peer pc = peers.get(socketId);
         if (pc == null) {
             //构建RTCPeerConnection PeerConnection相关回调进入Peer中
-            pc = new Peer(socketId,factory,rtcConfig,WebRtcClient.this);
+            pc = new Peer(socketId, factory, rtcConfig, WebRtcClient.this);
             //设置本地数据流
-            pc.getPc().addTrack(localVideoTrack);
+            if (localVideoTrack != null)
+                pc.getPc().addTrack(localVideoTrack);
             //保存peer连接
-            peers.put(socketId,pc);
+            peers.put(socketId, pc);
         }
         return pc;
     }
 
     //启动设备视频并关联本地video
-    public void startCamera(VideoSink localRender,int type){
-        if(pcParams.videoCallEnabled){
+    public void startCamera(VideoSink localRender, int type) {
+        if (pcParams.videoCallEnabled) {
             //创建VideoCapturer
-            if (cameraVideoCapturer == null){
+            if (cameraVideoCapturer == null) {
                 String cameraname = "";
                 Camera1Enumerator camera1Enumerator = new Camera1Enumerator();
                 String[] deviceNames = camera1Enumerator.getDeviceNames();
-                if (type == FONT_FACTING){
+                if (type == FONT_FACTING) {
                     //前置摄像头
-                    for (String deviceName : deviceNames){
-                        if (camera1Enumerator.isFrontFacing(deviceName)){
+                    for (String deviceName : deviceNames) {
+                        if (camera1Enumerator.isFrontFacing(deviceName)) {
                             cameraname = deviceName;
                         }
                     }
-                }else {
+                } else {
                     //后置摄像头
-                    for (String deviceName : deviceNames){
-                        if (camera1Enumerator.isBackFacing(deviceName)){
+                    for (String deviceName : deviceNames) {
+                        if (camera1Enumerator.isBackFacing(deviceName)) {
                             cameraname = deviceName;
                         }
                     }
                 }
-                cameraVideoCapturer = camera1Enumerator.createCapturer(cameraname,null);
+                cameraVideoCapturer = camera1Enumerator.createCapturer(cameraname, null);
                 SurfaceTextureHelper surfaceTextureHelper =
                         SurfaceTextureHelper.create("CaptureThread", eglBase.getEglBaseContext());
                 localVideoSource = factory.createVideoSource(false);
                 cameraVideoCapturer.initialize(surfaceTextureHelper, appContext, localVideoSource.getCapturerObserver());
-                cameraVideoCapturer.startCapture(pcParams.videoWidth,pcParams.videoHeight,pcParams.videoFps);
+                cameraVideoCapturer.startCapture(pcParams.videoWidth, pcParams.videoHeight, pcParams.videoFps);
                 localVideoTrack = factory.createVideoTrack("ARDAMSv0", localVideoSource);
                 localVideoTrack.setEnabled(true);
                 localVideoTrack.addSink(localRender);
-            }else{
-                cameraVideoCapturer.startCapture(pcParams.videoWidth,pcParams.videoHeight,pcParams.videoFps);
+            } else {
+                cameraVideoCapturer.startCapture(pcParams.videoWidth, pcParams.videoHeight, pcParams.videoFps);
             }
         }
     }
 
     //切换摄像头
-    public void switchCamera(){
-        if(cameraVideoCapturer != null){
+    public void switchCamera() {
+        if (cameraVideoCapturer != null) {
             cameraVideoCapturer.switchCamera(null);
         }
     }
 
     //关闭摄像头
-    public void closeCamera(){
-        if(cameraVideoCapturer != null){
+    public void closeCamera() {
+        if (cameraVideoCapturer != null) {
             try {
                 cameraVideoCapturer.stopCapture();
             } catch (InterruptedException e) {
@@ -368,7 +373,9 @@ public class WebRtcClient {
         }
     }
 
-    /** 信令服务器处理相关 **/
+    /**
+     * 信令服务器处理相关
+     **/
     //created [id,room,peers]
     private Emitter.Listener createdListener = new Emitter.Listener() {
         @Override
@@ -389,7 +396,7 @@ public class WebRtcClient {
                     //创建WebRtcPeerConnection
                     Peer pc = getOrCreateRtcConnect(otherSocketId);
                     //设置offer
-                    pc.getPc().createOffer(pc,sdpMediaConstraints);
+                    pc.getPc().createOffer(pc, sdpMediaConstraints);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -431,9 +438,9 @@ public class WebRtcClient {
                         data.getString("sdp")
                 );
                 //设置远端setRemoteDescription
-                pc.getPc().setRemoteDescription(pc,sdp);
+                pc.getPc().setRemoteDescription(pc, sdp);
                 //设置answer
-                pc.getPc().createAnswer(pc,sdpMediaConstraints);
+                pc.getPc().createAnswer(pc, sdpMediaConstraints);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -457,7 +464,7 @@ public class WebRtcClient {
                         data.getString("sdp")
                 );
                 //设置远端setRemoteDescription
-                pc.getPc().setRemoteDescription(pc,sdp);
+                pc.getPc().setRemoteDescription(pc, sdp);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -502,7 +509,7 @@ public class WebRtcClient {
                 String fromId = data.getString("from");
                 //判断是否为当前连接
                 Peer pc = peers.get(fromId);
-                if (pc != null){
+                if (pc != null) {
                     //peer关闭
                     getOrCreateRtcConnect(fromId).getPc().close();
                     //删除peer对象
@@ -516,12 +523,16 @@ public class WebRtcClient {
         }
     };
 
-    /** 信令服务器发送消息 **/
-    public void sendMessage(String event,JSONObject message){
+    /**
+     * 信令服务器发送消息
+     **/
+    public void sendMessage(String event, JSONObject message) {
         client.emit(event, message);
     }
 
-    /** WebRtc 音视频相关辅助函数**/
+    /**
+     * WebRtc 音视频相关辅助函数
+     **/
     //创建Media及Sdp约束
     private void createMediaConstraintsInternal() {
         // 音频约束
@@ -544,7 +555,7 @@ public class WebRtcClient {
         sdpMediaConstraints.mandatory.add(
                 new MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"));
         sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
-                "OfferToReceiveVideo", "true" ));
+                "OfferToReceiveVideo", "true"));
         sdpMediaConstraints.optional.add(new MediaConstraints.KeyValuePair("DtlsSrtpKeyAgreement", "true"));
     }
 
@@ -678,7 +689,7 @@ public class WebRtcClient {
     }
 
     //返回SSLSocketFactory 用于ssl连接
-    private  SSLSocketFactory getSSLSocketFactory() {
+    private SSLSocketFactory getSSLSocketFactory() {
         SSLSocketFactory ssfFactory = null;
 
         try {

@@ -3,7 +3,7 @@
 buildscript {
     repositories {
         maven {
-            url 'http://10.5.31.150:9528/artifactory/group_mobile/'
+            url 'http://men.codyy.cn/artifactory/group_mobile/'
         }
     }
     dependencies {
@@ -17,7 +17,7 @@ buildscript {
 allprojects {
     repositories {
         maven {
-            url 'http://10.5.31.150:9528/artifactory/group_mobile/'
+            url 'http://men.codyy.cn/artifactory/group_mobile/'
         }
     }
 }

@@ -3,6 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- 远端视频流 动态添加-->
+    <LinearLayout
+        android:id="@+id/remoteVideoLl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+    </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -66,14 +75,6 @@
             android:layout_gravity="center_horizontal"
             android:layout_margin="4dp" />
 
-        <!-- 远端视频流 动态添加-->
-        <LinearLayout
-            android:id="@+id/remoteVideoLl"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical">
-
-        </LinearLayout>
     </LinearLayout>
+
 </RelativeLayout>
