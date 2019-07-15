@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
+apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 27
     defaultConfig {
@@ -24,10 +26,12 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:27.1.1'
     //动态权限申请
     implementation 'com.yanzhenjie:permission:2.0.0-rc12'
     implementation 'io.socket:socket.io-client:1.0.0'
     implementation 'org.webrtc:google-webrtc:1.0.28513'
+    implementation 'com.github.codyy-mobile:DeviceUtils:0.0.3'
 
 }

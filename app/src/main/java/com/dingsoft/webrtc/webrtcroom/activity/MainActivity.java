@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.codyy.devicelibrary.DeviceUtils;
 import com.dingsoft.webrtc.webrtcroom.R;
 import com.dingsoft.webrtc.webrtcroom.webrtcmodule.PeerConnectionParameters;
 import com.dingsoft.webrtc.webrtcroom.webrtcmodule.RtcListener;
@@ -47,8 +48,8 @@ public class MainActivity extends Activity implements RtcListener,View.OnClickLi
     private PeerConnectionParameters peerConnectionParameters;
     //host地址
     //private String socketHost = "http://172.16.70.226:8081";
-//    private String socketHost = "https://10.5.223.159:8443";
-    private String socketHost = "https://192.168.0.104:8443";
+    private String socketHost = "https://10.5.223.159:8443";
+//    private String socketHost = "https://192.168.0.104:8443";
 
     //记录用户首次点击返回键的时间
     private long firstTime = 0;
@@ -257,12 +258,14 @@ public class MainActivity extends Activity implements RtcListener,View.OnClickLi
                 //初始化渲染源
                 remoteView.init(rootEglBase.getEglBaseContext(), null);
                 //填充模式
-                remoteView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
+                remoteView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
                 remoteView.setZOrderMediaOverlay(true);
                 remoteView.setEnableHardwareScaler(false);
                 remoteView.setMirror(false);
                 //控件布局
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
+                int width=Integer.parseInt( DeviceUtils.getScreenWidth(MainActivity.this));
+                int height=width*9/16;
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width,height);
 //                layoutParams.topMargin = 20;
                 remoteVideoLl.addView(remoteView,layoutParams);
                 //添加至hashmap中
