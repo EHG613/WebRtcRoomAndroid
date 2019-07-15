@@ -148,7 +148,7 @@ public class WebRtcClient {
 
     //创建IceServers参数
     private void createIceServers() {
-        iceServers.add(PeerConnection.IceServer.builder("stun:stun.xten.com").createIceServer());
+//        iceServers.add(PeerConnection.IceServer.builder("stun:stun.xten.com").createIceServer());
     }
 
     //创建RTCConfiguration参数
