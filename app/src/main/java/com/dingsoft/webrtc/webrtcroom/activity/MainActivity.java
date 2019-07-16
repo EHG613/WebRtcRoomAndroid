@@ -179,7 +179,8 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 break;
             case R.id.exit:
                 //退出聊天室
-                webRtcClient.exitRoom();
+                if (webRtcClient != null)
+                    webRtcClient.exitRoom();
                 createRoom.setEnabled(true);
                 break;
             default:
