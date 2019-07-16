@@ -26,6 +26,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    testImplementation 'junit:junit:4.12'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:27.1.1'
     //动态权限申请
@@ -33,5 +34,9 @@ dependencies {
     implementation 'io.socket:socket.io-client:1.0.0'
     implementation 'org.webrtc:google-webrtc:1.0.28513'
     implementation 'com.github.codyy-mobile:DeviceUtils:0.0.3'
+    def work_version = "1.0.1"
+    implementation "android.arch.work:work-runtime:$work_version"
+    // optional - Test helpers
+    androidTestImplementation "android.arch.work:work-testing:$work_version"
 
 }
