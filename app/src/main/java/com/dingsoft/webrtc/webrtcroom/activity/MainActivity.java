@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         Point displaySize = new Point();
         this.getWindowManager().getDefaultDisplay().getSize(displaySize);
         displaySize.set(480, 320);
-        peerConnectionParameters = new PeerConnectionParameters(false, false,
+        peerConnectionParameters = new PeerConnectionParameters(true, false,
                 false, displaySize.x, displaySize.y, 20,
                 0, "VP9",
                 true, false, 0, "OPUS",
