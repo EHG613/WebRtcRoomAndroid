@@ -10,7 +10,7 @@
         sl:emptyImg="@drawable/ic_state_empty"
         sl:emptyText="未搜索到PC客户端，请确认是否已打开PC客户端再进行操作"
         sl:errorImg="@drawable/ic_state_error"
-        sl:errorText="网络错误"
+        sl:errorText="服务已断开..."
         sl:loadingText="搜索中..."
         sl:loginImg="@drawable/ic_state_login"
         sl:loginText="登录提示文字"
