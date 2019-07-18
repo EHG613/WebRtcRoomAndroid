@@ -1,10 +1,10 @@
 package com.dingsoft.webrtc.webrtcroom.webrtcmodule;
 
 import android.content.Context;
-import android.opengl.EGLContext;
 import android.util.Log;
 
 import com.dingsoft.webrtc.webrtcroom.activity.MainActivity;
+import com.dingsoft.webrtc.webrtcroom.activity.SignalingListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,7 +17,6 @@ import org.webrtc.DefaultVideoEncoderFactory;
 import org.webrtc.EglBase;
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
-import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SessionDescription;
@@ -51,6 +50,8 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 import okhttp3.OkHttpClient;
+
+import static io.socket.client.Socket.EVENT_DISCONNECT;
 
 /**
  * WebRtcClient类 封装PeerConnectionFactory工厂类及Socket.IO信令服务器
@@ -88,6 +89,7 @@ public class WebRtcClient {
     private EglBase eglBase;
     //Activity回调接口
     private RtcListener rtcListener;
+    private SignalingListener signalingListener;
     //socket.io信令交互
     private Socket client;
     //信令服务器地址
@@ -144,6 +146,10 @@ public class WebRtcClient {
 
     public String getRoomId() {
         return roomId;
+    }
+
+    public void setSignalingListener(SignalingListener signalingListener) {
+        this.signalingListener = signalingListener;
     }
 
     //创建IceServers参数
@@ -238,7 +244,11 @@ public class WebRtcClient {
             opts.callFactory = okHttpClient;
             opts.webSocketFactory = okHttpClient;
             client = IO.socket(host, opts);
-
+            client.on(EVENT_DISCONNECT, args -> {
+                if(signalingListener!=null){
+                    signalingListener.disconnect();
+                }
+            });
             ////设置消息监听
             //created [id,room,peers]
             client.on("created", createdListener);
@@ -254,6 +264,7 @@ public class WebRtcClient {
             client.on("exit", exitListener);
             //开始连接
             client.connect();
+
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }

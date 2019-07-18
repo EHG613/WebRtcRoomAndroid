@@ -22,6 +22,7 @@ import com.dingsoft.webrtc.webrtcroom.life.PortWorkLifecycle;
 import com.dingsoft.webrtc.webrtcroom.webrtcmodule.PeerConnectionParameters;
 import com.dingsoft.webrtc.webrtcroom.webrtcmodule.RtcListener;
 import com.dingsoft.webrtc.webrtcroom.webrtcmodule.WebRtcClient;
+import com.fingdo.statelayout.StateLayout;
 import com.yanzhenjie.permission.Action;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.Permission;
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     private Button switchCamera;
     private Button createRoom;
     private Button exitRoom;
+    private StateLayout stateLayout;
     private SurfaceViewRenderer localSurfaceViewRenderer;
     private LinearLayout remoteVideoLl;
     private HashMap<String, View> remoteViews;
@@ -70,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                         | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.activity_main);
+        stateLayout = findViewById(R.id.state_layout);
         roomName = findViewById(R.id.room);
         openCamera = findViewById(R.id.openCamera);
         openCamera.setOnClickListener(this);
@@ -82,8 +85,24 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         localSurfaceViewRenderer = findViewById(R.id.localVideo);
         remoteVideoLl = findViewById(R.id.remoteVideoLl);
         remoteViews = new HashMap<>();
+        stateLayout.setUseAnimation(true);
+
+        stateLayout.showLoadingView();
         portWorkLifecycle = new PortWorkLifecycle(this);
         getLifecycle().addObserver(portWorkLifecycle);
+        stateLayout.setRefreshListener(new StateLayout.OnViewRefreshListener() {
+            @Override
+            public void refreshClick() {
+                if (portWorkLifecycle == null) return;
+                stateLayout.showLoadingView();
+                portWorkLifecycle.refresh();
+            }
+
+            @Override
+            public void loginClick() {
+
+            }
+        });
         portWorkLifecycle.setListener(new PortWorkLifecycle.PortWorkListener() {
             @Override
             public void CallBack(WorkInfo status) {
@@ -91,16 +110,19 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 Log.e("info", getString(R.string.host_addr, status.getOutputData().getString("ip"), status.getOutputData().getString("port")));
                 openCamera.performClick();
                 createRoom.performClick();
+                stateLayout.showContentView();
             }
 
             @Override
             public void NetWorkError() {
-                Toast.makeText(getApplicationContext(), "网络错误", Toast.LENGTH_LONG).show();
+                stateLayout.showNoNetworkView();
+//                Toast.makeText(getApplicationContext(), "网络错误", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void NotFound() {
-                Toast.makeText(getApplicationContext(), "未搜索到PC客户端，请确认是否已打开PC客户端再进行操作", Toast.LENGTH_LONG).show();
+                stateLayout.showTimeoutView();
+//                Toast.makeText(getApplicationContext(), "未搜索到PC客户端，请确认是否已打开PC客户端再进行操作", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -179,8 +201,17 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 break;
             case R.id.exit:
                 //退出聊天室
-                if (webRtcClient != null)
+                if (webRtcClient != null) {
                     webRtcClient.exitRoom();
+                    webRtcClient.closeCamera();
+                    //数据
+                    localSurfaceViewRenderer.clearImage();
+                    localSurfaceViewRenderer.setBackground(new ColorDrawable(getResources().getColor(R.color.colorBlack)));
+                    //localSurfaceViewRenderer.setForeground(new ColorDrawable(R.color.colorBlack));
+                    localSurfaceViewRenderer.release();
+                    isCameraOpen = false;
+                    openCamera.setText("开启摄像头");
+                }
                 createRoom.setEnabled(true);
                 break;
             default:
@@ -194,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         Point displaySize = new Point();
         this.getWindowManager().getDefaultDisplay().getSize(displaySize);
         displaySize.set(480, 320);
-        peerConnectionParameters = new PeerConnectionParameters(true, false,
+        peerConnectionParameters = new PeerConnectionParameters(false, false,
                 false, displaySize.x, displaySize.y, 20,
                 0, "VP9",
                 true, false, 0, "OPUS",
@@ -214,6 +245,13 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 peerConnectionParameters,
                 MainActivity.this,
                 host);
+        webRtcClient.setSignalingListener(() -> {
+            runOnUiThread(() -> {
+                exitRoom.performClick();
+                stateLayout.showErrorView();
+//                Toast.makeText(getApplicationContext(), "服务已断开", Toast.LENGTH_LONG).show();
+            });
+        });
     }
 
     //本地摄像头创建

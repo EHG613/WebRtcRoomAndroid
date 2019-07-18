@@ -3,14 +3,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- 远端视频流 动态添加-->
-    <LinearLayout
-        android:id="@+id/remoteVideoLl"
+    <com.fingdo.statelayout.StateLayout xmlns:sl="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/state_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        sl:emptyImg="@drawable/ic_state_empty"
+        sl:emptyText="未搜索到PC客户端，请确认是否已打开PC客户端再进行操作"
+        sl:errorImg="@drawable/ic_state_error"
+        sl:errorText="网络错误"
+        sl:loadingText="搜索中..."
+        sl:loginImg="@drawable/ic_state_login"
+        sl:loginText="登录提示文字"
+        sl:noNetworkImg="@drawable/ic_state_no_network"
+        sl:noNetworkText="网络错误"
+        sl:timeOutImg="@drawable/ic_state_time_out"
+        sl:timeOutText="未查询到相关设备...">
+        <!-- 远端视频流 动态添加-->
+        <LinearLayout
+            android:id="@+id/remoteVideoLl"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-    </LinearLayout>
+        </LinearLayout>
+    </com.fingdo.statelayout.StateLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,10 +37,10 @@
         <EditText
             android:id="@+id/room"
             android:layout_width="match_parent"
-            android:text="lijian"
-            android:visibility="gone"
             android:layout_height="wrap_content"
-            android:focusable="true"/>
+            android:focusable="true"
+            android:text="lijian"
+            android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -33,29 +50,29 @@
             <!-- 启动摄像头-->
             <Button
                 android:id="@+id/openCamera"
-                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="4dp"
-                android:text="启动摄像头" />
+                android:text="启动摄像头"
+                android:visibility="visible" />
 
             <!-- 启动摄像头-->
             <Button
                 android:id="@+id/switchCamera"
-                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="4dp"
-                android:text="切换摄像头" />
+                android:text="切换摄像头"
+                android:visibility="visible" />
 
             <!-- 创建并加入-->
             <Button
                 android:id="@+id/create"
-                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="4dp"
-                android:text="进入" />
+                android:text="进入"
+                android:visibility="gone" />
             <!-- 退出-->
             <Button
                 android:id="@+id/exit"
@@ -70,9 +87,9 @@
             android:id="@+id/localVideo"
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:visibility="gone"
             android:layout_gravity="center_horizontal"
-            android:layout_margin="4dp" />
+            android:layout_margin="4dp"
+            android:visibility="gone" />
 
     </LinearLayout>
 

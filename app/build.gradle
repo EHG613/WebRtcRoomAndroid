@@ -38,5 +38,5 @@ dependencies {
     implementation "android.arch.work:work-runtime:$work_version"
     // optional - Test helpers
     androidTestImplementation "android.arch.work:work-testing:$work_version"
-
+    implementation 'com.github.fingdo:stateLayout:1.0.4'
 }
