@@ -5,12 +5,28 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "com.dingsoft.webrtc.webrtcroom"
+        applicationId "com.codyy.people.learning"
         minSdkVersion 21
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
+    signingConfigs {
+        config {
+            keyAlias '人人学-助教'
+            keyPassword 'welcometocodyy'
+//            keyPassword System.console().readLine('Key password:')
+            storeFile file('../codyy.jks')
+            storePassword 'welcometocodyy'
+//            storePassword System.console().readLine('Keystore password:')
+        }
     }
     compileOptions {//使用JAVA8语法解析
         sourceCompatibility JavaVersion.VERSION_1_8
