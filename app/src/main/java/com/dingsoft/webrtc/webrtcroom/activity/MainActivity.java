@@ -82,6 +82,8 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         createRoom.setOnClickListener(this);
         exitRoom = findViewById(R.id.exit);
         exitRoom.setOnClickListener(this);
+        findViewById(R.id.stopCapture).setOnClickListener(this);
+        findViewById(R.id.startCapture).setOnClickListener(this);
         localSurfaceViewRenderer = findViewById(R.id.localVideo);
         remoteVideoLl = findViewById(R.id.remoteVideoLl);
         remoteViews = new HashMap<>();
@@ -214,6 +216,16 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 }
                 createRoom.setEnabled(true);
                 break;
+            case R.id.stopCapture:
+                if (webRtcClient != null) {
+                    webRtcClient.stopCapture();
+                }
+                break;
+            case R.id.startCapture:
+                if (webRtcClient != null) {
+                    webRtcClient.startCapture();
+                }
+                break;
             default:
                 break;
         }
@@ -224,8 +236,8 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         //获取webRtc 音视频配置参数
         Point displaySize = new Point();
         this.getWindowManager().getDefaultDisplay().getSize(displaySize);
-        displaySize.set(480, 320);
-        peerConnectionParameters = new PeerConnectionParameters(false, false,
+//        displaySize.set(480, 320);
+        peerConnectionParameters = new PeerConnectionParameters(true, false,
                 false, displaySize.x, displaySize.y, 20,
                 0, "VP9",
                 true, false, 0, "OPUS",

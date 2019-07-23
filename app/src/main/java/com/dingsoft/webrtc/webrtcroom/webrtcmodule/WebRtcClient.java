@@ -245,7 +245,7 @@ public class WebRtcClient {
             opts.webSocketFactory = okHttpClient;
             client = IO.socket(host, opts);
             client.on(EVENT_DISCONNECT, args -> {
-                if(signalingListener!=null){
+                if (signalingListener != null) {
                     signalingListener.disconnect();
                 }
             });
@@ -279,6 +279,7 @@ public class WebRtcClient {
         try {
             JSONObject message = new JSONObject();
             message.put("room", roomId);
+            message.put("role", "ctrl");
             //向信令服务器发送信令
             sendMessage("createAndJoinRoom", message);
         } catch (JSONException e) {
@@ -328,6 +329,22 @@ public class WebRtcClient {
         return pc;
     }
 
+    public void stopCapture() {
+        if (cameraVideoCapturer != null) {
+            try {
+                cameraVideoCapturer.stopCapture();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void startCapture() {
+        if(cameraVideoCapturer!=null) {
+            cameraVideoCapturer.startCapture(pcParams.videoWidth, pcParams.videoHeight, pcParams.videoFps);
+        }
+    }
+
     //启动设备视频并关联本地video
     public void startCamera(VideoSink localRender, int type) {
         if (pcParams.videoCallEnabled) {
@@ -356,7 +373,7 @@ public class WebRtcClient {
                         SurfaceTextureHelper.create("CaptureThread", eglBase.getEglBaseContext());
                 localVideoSource = factory.createVideoSource(false);
                 cameraVideoCapturer.initialize(surfaceTextureHelper, appContext, localVideoSource.getCapturerObserver());
-                cameraVideoCapturer.startCapture(pcParams.videoWidth, pcParams.videoHeight, pcParams.videoFps);
+//                cameraVideoCapturer.startCapture(pcParams.videoWidth, pcParams.videoHeight, pcParams.videoFps);
                 localVideoTrack = factory.createVideoTrack("ARDAMSv0", localVideoSource);
                 localVideoTrack.setEnabled(true);
                 localVideoTrack.addSink(localRender);
@@ -406,8 +423,11 @@ public class WebRtcClient {
                     String otherSocketId = otherPeer.getString("id");
                     //创建WebRtcPeerConnection
                     Peer pc = getOrCreateRtcConnect(otherSocketId);
-                    //设置offer
-                    pc.getPc().createOffer(pc, sdpMediaConstraints);
+                    pc.setRole(otherPeer.getString("role"));
+                    //设置offer  如果是包含pc角色，则创建应答
+                    if ("pc".equals(pc.getRole())) {
+                        pc.getPc().createOffer(pc, sdpMediaConstraints);
+                    }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

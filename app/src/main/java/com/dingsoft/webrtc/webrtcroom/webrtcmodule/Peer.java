@@ -26,6 +26,8 @@ public class Peer implements SdpObserver, PeerConnection.Observer {
     private PeerConnection pc;
     //PeerConnection标识
     private String id;
+    //用户角色
+    private String role;
     //webRtClient对象
     private WebRtcClient webRtcClient;
 
@@ -45,6 +47,14 @@ public class Peer implements SdpObserver, PeerConnection.Observer {
 
     public PeerConnection getPc() {
         return pc;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public void setPc(PeerConnection pc) {

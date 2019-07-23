@@ -64,6 +64,20 @@
                 android:layout_marginRight="4dp"
                 android:text="切换摄像头"
                 android:visibility="visible" />
+            <Button
+                android:id="@+id/stopCapture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:text="停止发流"
+                android:visibility="visible" />
+            <Button
+                android:id="@+id/startCapture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:text="开始发流"
+                android:visibility="visible" />
 
             <!-- 创建并加入-->
             <Button
