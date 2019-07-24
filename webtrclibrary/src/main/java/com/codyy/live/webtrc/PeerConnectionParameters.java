@@ -1,4 +1,4 @@
-package com.dingsoft.webrtc.webrtcroom.webrtcmodule;
+package com.codyy.live.webtrc;
 
 /**
  * PeerConnection连接参数

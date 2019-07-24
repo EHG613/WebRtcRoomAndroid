@@ -1,4 +1,4 @@
-package com.dingsoft.webrtc.webrtcroom.work;
+package com.codyy.live.webtrc.work;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -12,6 +12,10 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 
+/**
+ * 端口检测任务
+ * created by lijian on 2019.07.24
+ */
 public class PortWorker extends Worker {
     public PortWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);

@@ -1,4 +1,4 @@
-package com.dingsoft.webrtc.webrtcroom.life;
+package com.codyy.live.webtrc.life;
 
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleObserver;
@@ -10,8 +10,12 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
-import com.dingsoft.webrtc.webrtcroom.work.PortWorker;
+import com.codyy.live.webtrc.work.PortWorker;
 
+/**
+ * 端口检测任务生命周期绑定
+ * created by lijian on 2019.07.24
+ */
 public class PortWorkLifecycle implements LifecycleObserver {
     private FragmentActivity fragmentActivity;
     private PortWorkListener listener;

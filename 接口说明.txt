@@ -29,6 +29,10 @@ candidate：发送者设备candidate描述，Json类型
 from: 发送者socket连接标识，字符串
 room：房间名称，字符串
 
+7: 事件名：call 发送call信息{from,room,to}
+from: 发送者socket连接标示，字符串
+room: 房间名称
+to：接收者socket连接标识符,字符串
 --------------------Server To Client--------------------
 1：事件名：created   服务器通知客户端信令连接成功 {id,room,peers[{id}]}
 id: 当前socket连接标识，字符串
@@ -64,3 +68,8 @@ candidate：发送者设备candidate描述，Json类型
 6：事件名：exit  服务器转发exit消息 {from,room}
 from: 发送者socket连接标识，字符串
 room：房间名称，字符串
+
+7: 事件名：call 发送call信息{from,room,to}
+from: 发送者socket连接标示，字符串
+room: 房间名称
+to：接收者socket连接标识符,字符串

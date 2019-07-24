@@ -1,4 +1,4 @@
-package com.dingsoft.webrtc.webrtcroom.webrtcmodule;
+package com.codyy.live.webtrc;
 
 import android.util.Log;
 import org.json.JSONException;

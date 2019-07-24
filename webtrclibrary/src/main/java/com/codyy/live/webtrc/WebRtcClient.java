@@ -1,10 +1,9 @@
-package com.dingsoft.webrtc.webrtcroom.webrtcmodule;
+package com.codyy.live.webtrc;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
-import com.dingsoft.webrtc.webrtcroom.activity.MainActivity;
-import com.dingsoft.webrtc.webrtcroom.activity.SignalingListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,7 +50,6 @@ import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 import okhttp3.OkHttpClient;
 
-import static io.socket.client.Socket.EVENT_DISCONNECT;
 
 /**
  * WebRtcClient类 封装PeerConnectionFactory工厂类及Socket.IO信令服务器
@@ -244,7 +242,7 @@ public class WebRtcClient {
             opts.callFactory = okHttpClient;
             opts.webSocketFactory = okHttpClient;
             client = IO.socket(host, opts);
-            client.on(EVENT_DISCONNECT, args -> {
+            client.on(Socket.EVENT_DISCONNECT, args -> {
                 if (signalingListener != null) {
                     signalingListener.disconnect();
                 }
@@ -307,8 +305,7 @@ public class WebRtcClient {
         socketId = "";
         roomId = "";
         peers.clear();
-        //通知UI清空远端摄像头
-        ((MainActivity) rtcListener).clearRemoteCamera();
+
     }
 
     /**
@@ -332,6 +329,7 @@ public class WebRtcClient {
     public void stopCapture() {
         if (cameraVideoCapturer != null) {
             try {
+                endCall("pc");
                 cameraVideoCapturer.stopCapture();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -339,9 +337,54 @@ public class WebRtcClient {
         }
     }
 
+    public void endCall(String role) {
+        String to = null;
+        for (Peer peer : peers.values()) {
+            if (role.equals(peer.getRole())) {
+                to = peer.getId();
+                break;
+            }
+        }
+        if (TextUtils.isEmpty(to)) return;
+        //构建信令数据并发送
+        try {
+            JSONObject message = new JSONObject();
+            message.put("room", roomId);
+            message.put("from", socketId);
+            message.put("to", to);
+            //向信令服务器发送信令
+            sendMessage("endcall", message);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void call(String role) {
+        String to = null;
+        for (Peer peer : peers.values()) {
+            if (role.equals(peer.getRole())) {
+                to = peer.getId();
+                break;
+            }
+        }
+        if (TextUtils.isEmpty(to)) return;
+        //构建信令数据并发送
+        try {
+            JSONObject message = new JSONObject();
+            message.put("room", roomId);
+            message.put("from", socketId);
+            message.put("to", to);
+            //向信令服务器发送信令
+            sendMessage("call", message);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void startCapture() {
-        if(cameraVideoCapturer!=null) {
+        if (cameraVideoCapturer != null) {
             cameraVideoCapturer.startCapture(pcParams.videoWidth, pcParams.videoHeight, pcParams.videoFps);
+            call("pc");
         }
     }
 

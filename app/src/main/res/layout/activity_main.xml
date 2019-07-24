@@ -1,16 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:sl="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.fingdo.statelayout.StateLayout xmlns:sl="http://schemas.android.com/apk/res-auto"
+    <LinearLayout
+        android:id="@+id/ll_end"
+        android:layout_width="@dimen/right_margin"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        sl:layout_constraintBottom_toBottomOf="parent"
+        sl:layout_constraintEnd_toEndOf="parent"
+        sl:layout_constraintTop_toTopOf="parent">
+        <!-- 本地视频流 -->
+        <org.webrtc.SurfaceViewRenderer
+            android:id="@+id/localVideo"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:visibility="gone" />
+        <!-- room名-->
+        <EditText
+            android:id="@+id/room"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:text="lijian"
+            android:visibility="gone" />
+        <!-- 启动摄像头-->
+        <Button
+            android:id="@+id/openCamera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="4dp"
+            android:text="启动摄像头"
+            android:visibility="visible" />
+
+        <!-- 启动摄像头-->
+        <Button
+            android:id="@+id/switchCamera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="4dp"
+            android:text="切换摄像头"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/stopCapture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="4dp"
+            android:text="停止发流"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/startCapture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="4dp"
+            android:text="开始发流"
+            android:visibility="visible" />
+
+        <!-- 创建并加入-->
+        <Button
+            android:id="@+id/create"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="4dp"
+            android:text="进入"
+            android:visibility="gone" />
+        <!-- 退出-->
+        <Button
+            android:id="@+id/exit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="退出" />
+    </LinearLayout>
+
+    <com.fingdo.statelayout.StateLayout
         android:id="@+id/state_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         sl:emptyImg="@drawable/ic_state_empty"
         sl:emptyText="未搜索到PC客户端，请确认是否已打开PC客户端再进行操作"
         sl:errorImg="@drawable/ic_state_error"
         sl:errorText="服务已断开..."
+        sl:layout_constraintBottom_toBottomOf="parent"
+        sl:layout_constraintEnd_toStartOf="@id/ll_end"
+        sl:layout_constraintStart_toStartOf="parent"
+        sl:layout_constraintTop_toTopOf="parent"
         sl:loadingText="搜索中..."
         sl:loginImg="@drawable/ic_state_login"
         sl:loginText="登录提示文字"
@@ -28,83 +105,4 @@
         </LinearLayout>
     </com.fingdo.statelayout.StateLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <!-- room名-->
-        <EditText
-            android:id="@+id/room"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:focusable="true"
-            android:text="lijian"
-            android:visibility="gone" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal">
-            <!-- 启动摄像头-->
-            <Button
-                android:id="@+id/openCamera"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="4dp"
-                android:text="启动摄像头"
-                android:visibility="visible" />
-
-            <!-- 启动摄像头-->
-            <Button
-                android:id="@+id/switchCamera"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="4dp"
-                android:text="切换摄像头"
-                android:visibility="visible" />
-            <Button
-                android:id="@+id/stopCapture"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="4dp"
-                android:text="停止发流"
-                android:visibility="visible" />
-            <Button
-                android:id="@+id/startCapture"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="4dp"
-                android:text="开始发流"
-                android:visibility="visible" />
-
-            <!-- 创建并加入-->
-            <Button
-                android:id="@+id/create"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="4dp"
-                android:text="进入"
-                android:visibility="gone" />
-            <!-- 退出-->
-            <Button
-                android:id="@+id/exit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="退出" />
-        </LinearLayout>
-
-
-        <!-- 本地视频流 -->
-        <org.webrtc.SurfaceViewRenderer
-            android:id="@+id/localVideo"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="4dp"
-            android:visibility="gone" />
-
-    </LinearLayout>
-
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>
