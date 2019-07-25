@@ -9,6 +9,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/stu" />
             <option value="$PROJECT_DIR$/webtrclibrary" />
           </set>
         </option>

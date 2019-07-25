@@ -1,10 +1,11 @@
-package com.dingsoft.webrtc.webrtcroom.activity;
+package com.codyy.live.stu;
 
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -20,7 +21,6 @@ import com.codyy.devicelibrary.DeviceUtils;
 import com.codyy.live.webtrc.PeerConnectionParameters;
 import com.codyy.live.webtrc.RtcListener;
 import com.codyy.live.webtrc.WebRtcClient;
-import com.dingsoft.webrtc.webrtcroom.R;
 import com.codyy.live.webtrc.life.PortWorkLifecycle;
 import com.fingdo.statelayout.StateLayout;
 import com.yanzhenjie.permission.Action;
@@ -35,7 +35,8 @@ import org.webrtc.VideoTrack;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements RtcListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements RtcListener, View.OnClickListener{
+
     //控件
     private EditText roomName;
     private Button openCamera;
@@ -198,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 //创建并加入聊天室
                 String roomId = roomName.getText().toString();
                 if (isCameraOpen) {
-                    webRtcClient.createAndJoinRoom(roomId,"ctrl");
+                    webRtcClient.createAndJoinRoom(roomId,"client");
                     createRoom.setEnabled(false);
                 } else {
                     Toast.makeText(this, "请先开启摄像头", Toast.LENGTH_SHORT).show();
@@ -233,13 +234,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 break;
             case R.id.desktop:
                 if (webRtcClient != null) {
-                    if("共享桌面".equals(shareDesktop.getText().toString())) {
-                        shareDesktop.setText("结束共享");
-                        webRtcClient.shareDesktop();
-                    }else{
-                        shareDesktop.setText("共享桌面");
-                        webRtcClient.closeDesktop();
-                    }
+                    webRtcClient.shareDesktop();
                 }
                 break;
             default:
@@ -353,11 +348,12 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 remoteView.setEnableHardwareScaler(false);
                 remoteView.setMirror(false);
                 //控件布局
-                int width =  (Integer.parseInt(DeviceUtils.getScreenWidth(MainActivity.this))-getResources().getDimensionPixelSize(R.dimen.right_margin));
+                int width =  Integer.parseInt(DeviceUtils.getScreenWidth(MainActivity.this));
                 int height = width * 9 / 16;
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
 //                layoutParams.topMargin = 20;
 //                layoutParams.rightMargin=120;
+                layoutParams.gravity= Gravity.CENTER;
                 remoteVideoLl.addView(remoteView, layoutParams);
                 //添加至hashmap中
                 remoteViews.put(peerId, remoteView);

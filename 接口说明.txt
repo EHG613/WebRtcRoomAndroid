@@ -73,3 +73,5 @@ room：房间名称，字符串
 from: 发送者socket连接标示，字符串
 room: 房间名称
 to：接收者socket连接标识符,字符串
+--------------------截屏相关--------------------
+ScreenCapturerAndroid

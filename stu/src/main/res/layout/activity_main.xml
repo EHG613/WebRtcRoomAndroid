@@ -9,6 +9,7 @@
         android:layout_width="@dimen/right_margin"
         android:layout_height="0dp"
         android:orientation="vertical"
+        android:visibility="gone"
         sl:layout_constraintBottom_toBottomOf="parent"
         sl:layout_constraintEnd_toEndOf="parent"
         sl:layout_constraintTop_toTopOf="parent">
@@ -59,6 +60,7 @@
             android:layout_marginRight="4dp"
             android:text="开始发流"
             android:visibility="visible" />
+
         <Button
             android:id="@+id/desktop"
             android:layout_width="wrap_content"
@@ -107,6 +109,7 @@
             android:id="@+id/remoteVideoLl"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:gravity="center"
             android:orientation="vertical">
 
         </LinearLayout>

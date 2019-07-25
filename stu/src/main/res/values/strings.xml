@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">授课端</string>
+    <string name="app_name">学生端</string>
     <string name="host_addr">https://%s:%s</string>
 </resources>

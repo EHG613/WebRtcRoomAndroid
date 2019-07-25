@@ -96,6 +96,7 @@ public class WebRtcClient {
     private String socketId;
     //room id
     private String roomId;
+    private String role;
 
     ////webRtc定义常量////
     private static final String AUDIO_ECHO_CANCELLATION_CONSTRAINT = "googEchoCancellation";
@@ -272,12 +273,13 @@ public class WebRtcClient {
      * UI操作相关
      */
     //创建并加入
-    public void createAndJoinRoom(String roomId) {
+    public void createAndJoinRoom(String roomId, String role) {
+        this.role = role;
         //构建信令数据并发送
         try {
             JSONObject message = new JSONObject();
             message.put("room", roomId);
-            message.put("role", "ctrl");
+            message.put("role", role);
             //向信令服务器发送信令
             sendMessage("createAndJoinRoom", message);
         } catch (JSONException e) {
@@ -326,10 +328,13 @@ public class WebRtcClient {
         return pc;
     }
 
-    public void stopCapture() {
+    /**
+     * 共享桌面
+     */
+    public void shareDesktop() {
         if (cameraVideoCapturer != null) {
             try {
-                endCall("pc");
+                p2p("desktop", "pc");
                 cameraVideoCapturer.stopCapture();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -337,29 +342,33 @@ public class WebRtcClient {
         }
     }
 
-    public void endCall(String role) {
-        String to = null;
-        for (Peer peer : peers.values()) {
-            if (role.equals(peer.getRole())) {
-                to = peer.getId();
-                break;
+    /**
+     * 关闭桌面共享
+     */
+    public void closeDesktop() {
+        if (cameraVideoCapturer != null) {
+            try {
+                p2p("closedesktop", "pc");
+                cameraVideoCapturer.stopCapture();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        }
-        if (TextUtils.isEmpty(to)) return;
-        //构建信令数据并发送
-        try {
-            JSONObject message = new JSONObject();
-            message.put("room", roomId);
-            message.put("from", socketId);
-            message.put("to", to);
-            //向信令服务器发送信令
-            sendMessage("endcall", message);
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
     }
 
-    public void call(String role) {
+    public void stopCapture() {
+        if (cameraVideoCapturer != null) {
+            try {
+                p2p("endcall", "pc");
+                cameraVideoCapturer.stopCapture();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    public void p2p(String event, String role) {
         String to = null;
         for (Peer peer : peers.values()) {
             if (role.equals(peer.getRole())) {
@@ -375,7 +384,7 @@ public class WebRtcClient {
             message.put("from", socketId);
             message.put("to", to);
             //向信令服务器发送信令
-            sendMessage("call", message);
+            sendMessage(event, message);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -384,7 +393,7 @@ public class WebRtcClient {
     public void startCapture() {
         if (cameraVideoCapturer != null) {
             cameraVideoCapturer.startCapture(pcParams.videoWidth, pcParams.videoHeight, pcParams.videoFps);
-            call("pc");
+            p2p("call", "pc");
         }
     }
 
@@ -458,6 +467,7 @@ public class WebRtcClient {
                 socketId = data.getString("id");
                 //设置room id
                 roomId = data.getString("room");
+
                 //获取peer数据
                 JSONArray peers = data.getJSONArray("peers");
                 //根据回应peers 循环创建WebRtcPeerConnection，创建成功后发送offer消息 [from,to,room,sdp]
@@ -468,8 +478,11 @@ public class WebRtcClient {
                     Peer pc = getOrCreateRtcConnect(otherSocketId);
                     pc.setRole(otherPeer.getString("role"));
                     //设置offer  如果是包含pc角色，则创建应答
-                    if ("pc".equals(pc.getRole())) {
-                        pc.getPc().createOffer(pc, sdpMediaConstraints);
+                    if (!"client".equals(role)) //如果是学生端，则不主动建立rtc连接
+                    {
+                        if ("pc".equals(pc.getRole())) {
+                            pc.getPc().createOffer(pc, sdpMediaConstraints);
+                        }
                     }
                 }
             } catch (JSONException e) {
