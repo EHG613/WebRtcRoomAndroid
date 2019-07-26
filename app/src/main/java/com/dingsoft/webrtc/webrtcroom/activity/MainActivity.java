@@ -1,7 +1,11 @@
 package com.dingsoft.webrtc.webrtcroom.activity;
 
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
+import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -18,6 +22,7 @@ import androidx.work.WorkInfo;
 
 import com.codyy.devicelibrary.DeviceUtils;
 import com.codyy.live.webtrc.PeerConnectionParameters;
+import com.codyy.live.webtrc.Role;
 import com.codyy.live.webtrc.RtcListener;
 import com.codyy.live.webtrc.WebRtcClient;
 import com.dingsoft.webrtc.webrtcroom.R;
@@ -43,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     private Button createRoom;
     private Button exitRoom;
     private Button shareDesktop;
+    private Button mMirror;
     private StateLayout stateLayout;
     private SurfaceViewRenderer localSurfaceViewRenderer;
     private LinearLayout remoteVideoLl;
@@ -85,16 +91,15 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         exitRoom.setOnClickListener(this);
         shareDesktop = findViewById(R.id.desktop);
         shareDesktop.setOnClickListener(this);
+        mMirror = findViewById(R.id.mirror);
+        mMirror.setOnClickListener(this);
         findViewById(R.id.stopCapture).setOnClickListener(this);
         findViewById(R.id.startCapture).setOnClickListener(this);
         localSurfaceViewRenderer = findViewById(R.id.localVideo);
         remoteVideoLl = findViewById(R.id.remoteVideoLl);
         remoteViews = new HashMap<>();
         stateLayout.setUseAnimation(true);
-
         stateLayout.showLoadingView();
-        portWorkLifecycle = new PortWorkLifecycle(this);
-        getLifecycle().addObserver(portWorkLifecycle);
         stateLayout.setRefreshListener(new StateLayout.OnViewRefreshListener() {
             @Override
             public void refreshClick() {
@@ -108,6 +113,13 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
 
             }
         });
+        initCall();
+    }
+
+
+    private void initCall() {
+        portWorkLifecycle = new PortWorkLifecycle(this);
+        getLifecycle().addObserver(portWorkLifecycle);
         portWorkLifecycle.setListener(new PortWorkLifecycle.PortWorkListener() {
             @Override
             public void CallBack(WorkInfo status) {
@@ -131,7 +143,6 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             }
         });
     }
-
 
     @Override
     protected void onResume() {
@@ -198,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 //创建并加入聊天室
                 String roomId = roomName.getText().toString();
                 if (isCameraOpen) {
-                    webRtcClient.createAndJoinRoom(roomId,"ctrl");
+                    webRtcClient.createAndJoinRoom(roomId, Role.CTRL);
                     createRoom.setEnabled(false);
                 } else {
                     Toast.makeText(this, "请先开启摄像头", Toast.LENGTH_SHORT).show();
@@ -233,12 +244,23 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 break;
             case R.id.desktop:
                 if (webRtcClient != null) {
-                    if("共享桌面".equals(shareDesktop.getText().toString())) {
+                    if ("共享桌面".equals(shareDesktop.getText().toString())) {
                         shareDesktop.setText("结束共享");
                         webRtcClient.shareDesktop();
-                    }else{
+                    } else {
                         shareDesktop.setText("共享桌面");
                         webRtcClient.closeDesktop();
+                    }
+                }
+                break;
+            case R.id.mirror:
+                if (webRtcClient != null) {
+                    if ("镜像".equals(mMirror.getText().toString())) {
+                        mMirror.setText("取消镜像");
+                        webRtcClient.mirror();
+                    } else {
+                        mMirror.setText("镜像");
+                        webRtcClient.unMirror();
                     }
                 }
                 break;
@@ -353,7 +375,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 remoteView.setEnableHardwareScaler(false);
                 remoteView.setMirror(false);
                 //控件布局
-                int width =  (Integer.parseInt(DeviceUtils.getScreenWidth(MainActivity.this))-getResources().getDimensionPixelSize(R.dimen.right_margin));
+                int width = (Integer.parseInt(DeviceUtils.getScreenWidth(MainActivity.this)) - getResources().getDimensionPixelSize(R.dimen.right_margin));
                 int height = width * 9 / 16;
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
 //                layoutParams.topMargin = 20;

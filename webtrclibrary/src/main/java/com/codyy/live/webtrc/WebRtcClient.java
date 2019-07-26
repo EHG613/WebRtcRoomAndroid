@@ -1,6 +1,7 @@
 package com.codyy.live.webtrc;
 
 import android.content.Context;
+import android.media.projection.MediaProjection;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -10,6 +11,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.webrtc.AudioTrack;
 import org.webrtc.Camera1Enumerator;
+import org.webrtc.Camera2Enumerator;
+import org.webrtc.CameraEnumerator;
 import org.webrtc.CameraVideoCapturer;
 import org.webrtc.DefaultVideoDecoderFactory;
 import org.webrtc.DefaultVideoEncoderFactory;
@@ -18,10 +21,12 @@ import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
+import org.webrtc.ScreenCapturerAndroid;
 import org.webrtc.SessionDescription;
 import org.webrtc.SoftwareVideoDecoderFactory;
 import org.webrtc.SoftwareVideoEncoderFactory;
 import org.webrtc.SurfaceTextureHelper;
+import org.webrtc.VideoCapturer;
 import org.webrtc.VideoDecoderFactory;
 import org.webrtc.VideoEncoderFactory;
 import org.webrtc.VideoSink;
@@ -39,9 +44,7 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 
@@ -80,7 +83,7 @@ public class WebRtcClient {
     //音频Track
     private AudioTrack localAudioTrack;
     //本地摄像头视频捕获
-    private CameraVideoCapturer cameraVideoCapturer;
+    private VideoCapturer mVideoCapturer;
     //页面context
     private Context appContext;
     //WebRtc EglContext环境
@@ -229,12 +232,7 @@ public class WebRtcClient {
 
             //SSL加密连接
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                    .hostnameVerifier(new HostnameVerifier() {
-                        @Override
-                        public boolean verify(String hostname, SSLSession session) {
-                            return true;
-                        }
-                    })
+                    .hostnameVerifier((hostname, session) -> true)
                     .sslSocketFactory(getSSLSocketFactory(), new TrustAllCerts())
                     .build();
             IO.setDefaultOkHttpWebSocketFactory(okHttpClient);
@@ -253,6 +251,7 @@ public class WebRtcClient {
             client.on("created", createdListener);
             //joined [id,room]
             client.on("joined", joinedListener);
+            client.on("mirroring", mirroringListener);
             //offer [from,to,room,sdp]
             client.on("offer", offerListener);
             //answer [from,to,room,sdp]
@@ -328,14 +327,51 @@ public class WebRtcClient {
         return pc;
     }
 
+    public void mirror() {
+        createMirrorMessage("mirror");
+    }
+
+    public void unMirror() {
+        createMirrorMessage("unmirror");
+    }
+
+    private void createMirrorMessage(String event) {
+        String to = null;
+        JSONArray p2Mirrors = new JSONArray();
+        for (Peer peer : peers.values()) {
+            if (Role.PC.equals(peer.getRole())) {
+                to = peer.getId();
+                break;
+            }
+        }
+        for (Peer peer : peers.values()) {
+            if (Role.CLIENT.equals(peer.getRole()) || peer.getRole() == null) {
+                p2Mirrors.put(peer.getId());
+            }
+        }
+        if (TextUtils.isEmpty(to) || p2Mirrors.length() == 0) return;
+        //构建信令数据并发送
+        try {
+            JSONObject message = new JSONObject();
+            message.put("room", roomId);
+            message.put("from", socketId);
+            message.put("to", to);
+            message.put("peers", p2Mirrors);
+            //向信令服务器发送信令
+            sendMessage(event, message);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * 共享桌面
      */
     public void shareDesktop() {
-        if (cameraVideoCapturer != null) {
+        if (mVideoCapturer != null) {
             try {
                 p2p("desktop", "pc");
-                cameraVideoCapturer.stopCapture();
+                mVideoCapturer.stopCapture();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -346,10 +382,10 @@ public class WebRtcClient {
      * 关闭桌面共享
      */
     public void closeDesktop() {
-        if (cameraVideoCapturer != null) {
+        if (mVideoCapturer != null) {
             try {
                 p2p("closedesktop", "pc");
-                cameraVideoCapturer.stopCapture();
+                mVideoCapturer.stopCapture();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -357,10 +393,10 @@ public class WebRtcClient {
     }
 
     public void stopCapture() {
-        if (cameraVideoCapturer != null) {
+        if (mVideoCapturer != null) {
             try {
                 p2p("endcall", "pc");
-                cameraVideoCapturer.stopCapture();
+                mVideoCapturer.stopCapture();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -391,9 +427,23 @@ public class WebRtcClient {
     }
 
     public void startCapture() {
-        if (cameraVideoCapturer != null) {
-            cameraVideoCapturer.startCapture(pcParams.videoWidth, pcParams.videoHeight, pcParams.videoFps);
+        if (mVideoCapturer != null) {
+            mVideoCapturer.startCapture(pcParams.videoWidth, pcParams.videoHeight, pcParams.videoFps);
             p2p("call", "pc");
+        }
+    }
+    public void startScreen() {
+        if (mVideoCapturer != null) {
+            mVideoCapturer.startCapture(pcParams.videoWidth, pcParams.videoHeight, pcParams.videoFps);
+        }
+    }
+    public void stopScreen() {
+        if (mVideoCapturer != null) {
+            try {
+                mVideoCapturer.stopCapture();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -401,52 +451,66 @@ public class WebRtcClient {
     public void startCamera(VideoSink localRender, int type) {
         if (pcParams.videoCallEnabled) {
             //创建VideoCapturer
-            if (cameraVideoCapturer == null) {
-                String cameraname = "";
-                Camera1Enumerator camera1Enumerator = new Camera1Enumerator();
-                String[] deviceNames = camera1Enumerator.getDeviceNames();
-                if (type == FONT_FACTING) {
-                    //前置摄像头
-                    for (String deviceName : deviceNames) {
-                        if (camera1Enumerator.isFrontFacing(deviceName)) {
-                            cameraname = deviceName;
+            if (mVideoCapturer == null) {
+                if (!pcParams.screencaptureEnabled) {
+                    String cameraname = "";
+
+                    CameraEnumerator cameraEnumerator = Camera2Enumerator.isSupported(appContext) ? new Camera2Enumerator(appContext) : new Camera1Enumerator();
+                    String[] deviceNames = cameraEnumerator.getDeviceNames();
+                    if (type == FONT_FACTING) {
+                        //前置摄像头
+                        for (String deviceName : deviceNames) {
+                            if (cameraEnumerator.isFrontFacing(deviceName)) {
+                                cameraname = deviceName;
+                            }
+                        }
+                    } else {
+                        //后置摄像头
+                        for (String deviceName : deviceNames) {
+                            if (cameraEnumerator.isBackFacing(deviceName)) {
+                                cameraname = deviceName;
+                            }
                         }
                     }
+                    mVideoCapturer = cameraEnumerator.createCapturer(cameraname, null);
                 } else {
-                    //后置摄像头
-                    for (String deviceName : deviceNames) {
-                        if (camera1Enumerator.isBackFacing(deviceName)) {
-                            cameraname = deviceName;
+                    mVideoCapturer = new ScreenCapturerAndroid(pcParams.mediaProjectionPermissionResultData, new MediaProjection.Callback() {
+                        @Override
+                        public void onStop() {
+                            super.onStop();
                         }
-                    }
+                    });
                 }
-                cameraVideoCapturer = camera1Enumerator.createCapturer(cameraname, null);
-                SurfaceTextureHelper surfaceTextureHelper =
-                        SurfaceTextureHelper.create("CaptureThread", eglBase.getEglBaseContext());
-                localVideoSource = factory.createVideoSource(false);
-                cameraVideoCapturer.initialize(surfaceTextureHelper, appContext, localVideoSource.getCapturerObserver());
-//                cameraVideoCapturer.startCapture(pcParams.videoWidth, pcParams.videoHeight, pcParams.videoFps);
-                localVideoTrack = factory.createVideoTrack("ARDAMSv0", localVideoSource);
-                localVideoTrack.setEnabled(true);
-                localVideoTrack.addSink(localRender);
+                createVideoSource(localRender);
             } else {
-                cameraVideoCapturer.startCapture(pcParams.videoWidth, pcParams.videoHeight, pcParams.videoFps);
+                mVideoCapturer.startCapture(pcParams.videoWidth, pcParams.videoHeight, pcParams.videoFps);
             }
         }
     }
 
+    private void createVideoSource(VideoSink localRender) {
+        SurfaceTextureHelper surfaceTextureHelper =
+                SurfaceTextureHelper.create("CaptureThread", eglBase.getEglBaseContext());
+        localVideoSource = factory.createVideoSource(pcParams.screencaptureEnabled);
+        mVideoCapturer.initialize(surfaceTextureHelper, appContext, localVideoSource.getCapturerObserver());
+//                mVideoCapturer.startCapture(pcParams.videoWidth, pcParams.videoHeight, pcParams.videoFps);
+        localVideoTrack = factory.createVideoTrack("ARDAMSv0", localVideoSource);
+        localVideoTrack.setEnabled(true);
+        localVideoTrack.addSink(localRender);
+    }
+
     //切换摄像头
     public void switchCamera() {
-        if (cameraVideoCapturer != null) {
-            cameraVideoCapturer.switchCamera(null);
+        if (mVideoCapturer != null && mVideoCapturer instanceof CameraVideoCapturer) {
+            ((CameraVideoCapturer) mVideoCapturer).switchCamera(null);
         }
     }
 
     //关闭摄像头
     public void closeCamera() {
-        if (cameraVideoCapturer != null) {
+        if (mVideoCapturer != null) {
             try {
-                cameraVideoCapturer.stopCapture();
+                mVideoCapturer.stopCapture();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -478,9 +542,9 @@ public class WebRtcClient {
                     Peer pc = getOrCreateRtcConnect(otherSocketId);
                     pc.setRole(otherPeer.getString("role"));
                     //设置offer  如果是包含pc角色，则创建应答
-                    if (!"client".equals(role)) //如果是学生端，则不主动建立rtc连接
+                    if (!Role.CLIENT.equals(role)) //如果是学生端，则不主动建立rtc连接
                     {
-                        if ("pc".equals(pc.getRole())) {
+                        if (Role.PC.equals(pc.getRole())) {
                             pc.getPc().createOffer(pc, sdpMediaConstraints);
                         }
                     }
@@ -502,6 +566,25 @@ public class WebRtcClient {
                 String fromId = data.getString("id");
                 //构建pcconnection
                 getOrCreateRtcConnect(fromId);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+    public static boolean isMirroring;
+    private Emitter.Listener mirroringListener = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            JSONObject data = (JSONObject) args[0];
+            Log.d(TAG, "mirroring:" + data);
+            try {
+                //获取新加入socketId
+                isMirroring = data.getBoolean("mirroring");
+                if(isMirroring){
+                    startScreen();
+                }else {
+                    stopScreen();
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }

@@ -66,6 +66,13 @@
             android:layout_marginRight="4dp"
             android:text="共享桌面"
             android:visibility="visible" />
+        <Button
+            android:id="@+id/mirror"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="4dp"
+            android:text="镜像"
+            android:visibility="visible" />
 
         <!-- 创建并加入-->
         <Button

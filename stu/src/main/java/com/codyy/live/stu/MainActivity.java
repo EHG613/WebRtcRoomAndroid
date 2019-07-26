@@ -1,7 +1,11 @@
 package com.codyy.live.stu;
 
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
+import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,6 +23,7 @@ import androidx.work.WorkInfo;
 
 import com.codyy.devicelibrary.DeviceUtils;
 import com.codyy.live.webtrc.PeerConnectionParameters;
+import com.codyy.live.webtrc.Role;
 import com.codyy.live.webtrc.RtcListener;
 import com.codyy.live.webtrc.WebRtcClient;
 import com.codyy.live.webtrc.life.PortWorkLifecycle;
@@ -35,7 +40,7 @@ import org.webrtc.VideoTrack;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements RtcListener, View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements RtcListener, View.OnClickListener {
 
     //控件
     private EditText roomName;
@@ -92,10 +97,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         remoteVideoLl = findViewById(R.id.remoteVideoLl);
         remoteViews = new HashMap<>();
         stateLayout.setUseAnimation(true);
-
         stateLayout.showLoadingView();
-        portWorkLifecycle = new PortWorkLifecycle(this);
-        getLifecycle().addObserver(portWorkLifecycle);
         stateLayout.setRefreshListener(new StateLayout.OnViewRefreshListener() {
             @Override
             public void refreshClick() {
@@ -109,6 +111,35 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
 
             }
         });
+        startScreenCapture();
+    }
+
+    private static final int CAPTURE_PERMISSION_REQUEST_CODE = 1;
+
+    @TargetApi(21)
+    private void startScreenCapture() {
+        MediaProjectionManager mediaProjectionManager =
+                (MediaProjectionManager) getApplication().getSystemService(
+                        Context.MEDIA_PROJECTION_SERVICE);
+        startActivityForResult(
+                mediaProjectionManager.createScreenCaptureIntent(), CAPTURE_PERMISSION_REQUEST_CODE);
+    }
+
+    private static Intent mediaProjectionPermissionResultData;
+    private static int mediaProjectionPermissionResultCode;
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode != CAPTURE_PERMISSION_REQUEST_CODE)
+            return;
+        mediaProjectionPermissionResultCode = resultCode;
+        mediaProjectionPermissionResultData = data;
+        initCall();
+    }
+
+    private void initCall() {
+        portWorkLifecycle = new PortWorkLifecycle(this);
+        getLifecycle().addObserver(portWorkLifecycle);
         portWorkLifecycle.setListener(new PortWorkLifecycle.PortWorkListener() {
             @Override
             public void CallBack(WorkInfo status) {
@@ -132,7 +163,6 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             }
         });
     }
-
 
     @Override
     protected void onResume() {
@@ -199,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 //创建并加入聊天室
                 String roomId = roomName.getText().toString();
                 if (isCameraOpen) {
-                    webRtcClient.createAndJoinRoom(roomId,"client");
+                    webRtcClient.createAndJoinRoom(roomId, Role.CLIENT);
                     createRoom.setEnabled(false);
                 } else {
                     Toast.makeText(this, "请先开启摄像头", Toast.LENGTH_SHORT).show();
@@ -247,13 +277,13 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         //获取webRtc 音视频配置参数
         Point displaySize = new Point();
         this.getWindowManager().getDefaultDisplay().getSize(displaySize);
-        displaySize.set(480, 320);//设置画面的大小
+//        displaySize.set(480, 320);//设置画面的大小
         peerConnectionParameters = new PeerConnectionParameters(true, false,
                 false, displaySize.x, displaySize.y, 20,
                 0, "H264 High",
                 true, false, 0, "OPUS",
                 false, false, false, false, false, false,
-                false, false, false, false);
+                false, false, false, false,true,mediaProjectionPermissionResultData);
     }
 
     //创建webRtcClient
@@ -337,7 +367,10 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ////UI线程执行
+                //镜像投屏中,不加载远端视频
+                if (WebRtcClient.isMirroring) {
+                    return;
+                }                ////UI线程执行
                 //构建远端view
                 SurfaceViewRenderer remoteView = new SurfaceViewRenderer(MainActivity.this);
                 //初始化渲染源
@@ -348,18 +381,19 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 remoteView.setEnableHardwareScaler(false);
                 remoteView.setMirror(false);
                 //控件布局
-                int width =  Integer.parseInt(DeviceUtils.getScreenWidth(MainActivity.this));
+                int width = Integer.parseInt(DeviceUtils.getScreenWidth(MainActivity.this));
                 int height = width * 9 / 16;
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
 //                layoutParams.topMargin = 20;
 //                layoutParams.rightMargin=120;
-                layoutParams.gravity= Gravity.CENTER;
+                layoutParams.gravity = Gravity.CENTER;
                 remoteVideoLl.addView(remoteView, layoutParams);
                 //添加至hashmap中
                 remoteViews.put(peerId, remoteView);
                 //添加数据
                 //VideoTrack videoTrack = mediaStream.videoTracks.get(0);
                 videoTrack.addSink(remoteView);
+
             }
         });
     }

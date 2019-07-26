@@ -33,6 +33,8 @@ room：房间名称，字符串
 from: 发送者socket连接标示，字符串
 room: 房间名称
 to：接收者socket连接标识符,字符串
+8: 事件名：mirror 发送mirror信息{from,room,to,peers[{id}]}
+peers:要进行镜像的socket连接标识符数组
 --------------------Server To Client--------------------
 1：事件名：created   服务器通知客户端信令连接成功 {id,room,peers[{id}]}
 id: 当前socket连接标识，字符串

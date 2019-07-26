@@ -1,5 +1,7 @@
 package com.codyy.live.webtrc;
 
+import android.content.Intent;
+
 /**
  * PeerConnection连接参数
  * Created by chengshaobo on 2018/10/24.
@@ -28,6 +30,8 @@ public class PeerConnectionParameters {
     public final boolean disableWebRtcAGCAndHPF;
     public final boolean enableRtcEventLog;
     public final boolean useLegacyAudioDevice;
+    public boolean screencaptureEnabled;
+    public Intent mediaProjectionPermissionResultData;
 
     public PeerConnectionParameters(boolean videoCallEnabled, boolean loopback, boolean tracing,
                                     int videoWidth, int videoHeight, int videoFps, int videoMaxBitrate, String videoCodec,
@@ -58,5 +62,38 @@ public class PeerConnectionParameters {
         this.disableWebRtcAGCAndHPF = disableWebRtcAGCAndHPF;
         this.enableRtcEventLog = enableRtcEventLog;
         this.useLegacyAudioDevice = useLegacyAudioDevice;
+    }
+
+    public PeerConnectionParameters(boolean videoCallEnabled, boolean loopback, boolean tracing,
+                                    int videoWidth, int videoHeight, int videoFps, int videoMaxBitrate, String videoCodec,
+                                    boolean videoCodecHwAcceleration, boolean videoFlexfecEnabled, int audioStartBitrate,
+                                    String audioCodec, boolean noAudioProcessing, boolean aecDump, boolean saveInputAudioToFile,
+                                    boolean useOpenSLES, boolean disableBuiltInAEC, boolean disableBuiltInAGC,
+                                    boolean disableBuiltInNS, boolean disableWebRtcAGCAndHPF, boolean enableRtcEventLog,
+                                    boolean useLegacyAudioDevice, boolean screencaptureEnabled,Intent mediaProjectionPermissionResultData) {
+        this.videoCallEnabled = videoCallEnabled;
+        this.loopback = loopback;
+        this.tracing = tracing;
+        this.videoWidth = videoWidth;
+        this.videoHeight = videoHeight;
+        this.videoFps = videoFps;
+        this.videoMaxBitrate = videoMaxBitrate;
+        this.videoCodec = videoCodec;
+        this.videoFlexfecEnabled = videoFlexfecEnabled;
+        this.videoCodecHwAcceleration = videoCodecHwAcceleration;
+        this.audioStartBitrate = audioStartBitrate;
+        this.audioCodec = audioCodec;
+        this.noAudioProcessing = noAudioProcessing;
+        this.aecDump = aecDump;
+        this.saveInputAudioToFile = saveInputAudioToFile;
+        this.useOpenSLES = useOpenSLES;
+        this.disableBuiltInAEC = disableBuiltInAEC;
+        this.disableBuiltInAGC = disableBuiltInAGC;
+        this.disableBuiltInNS = disableBuiltInNS;
+        this.disableWebRtcAGCAndHPF = disableWebRtcAGCAndHPF;
+        this.enableRtcEventLog = enableRtcEventLog;
+        this.useLegacyAudioDevice = useLegacyAudioDevice;
+        this.screencaptureEnabled = screencaptureEnabled;
+        this.mediaProjectionPermissionResultData=mediaProjectionPermissionResultData;
     }
 }
