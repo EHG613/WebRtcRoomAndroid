@@ -112,7 +112,17 @@
             android:gravity="center"
             android:orientation="vertical">
 
+
         </LinearLayout>
     </com.fingdo.statelayout.StateLayout>
 
+    <VideoView
+        android:id="@+id/video"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        sl:layout_constraintBottom_toBottomOf="parent"
+        sl:layout_constraintEnd_toStartOf="@id/ll_end"
+        sl:layout_constraintStart_toStartOf="parent"
+        sl:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>

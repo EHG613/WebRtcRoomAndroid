@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import androidx.work.WorkInfo;
 
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     private Button createRoom;
     private Button exitRoom;
     private Button shareDesktop;
+    private VideoView mVideoView;
     private StateLayout stateLayout;
     private SurfaceViewRenderer localSurfaceViewRenderer;
     private LinearLayout remoteVideoLl;
@@ -89,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         createRoom.setOnClickListener(this);
         exitRoom = findViewById(R.id.exit);
         exitRoom.setOnClickListener(this);
+        mVideoView = findViewById(R.id.video);
         shareDesktop = findViewById(R.id.desktop);
         shareDesktop.setOnClickListener(this);
         findViewById(R.id.stopCapture).setOnClickListener(this);
@@ -283,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 0, "H264 High",
                 true, false, 0, "OPUS",
                 false, false, false, false, false, false,
-                false, false, false, false,true,mediaProjectionPermissionResultData);
+                false, false, false, false, true, mediaProjectionPermissionResultData);
     }
 
     //创建webRtcClient
@@ -370,7 +373,10 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 //镜像投屏中,不加载远端视频
                 if (WebRtcClient.isMirroring) {
                     return;
-                }                ////UI线程执行
+                }
+                mVideoView.stopPlayback();
+                mVideoView.setVisibility(View.GONE);
+                ////UI线程执行
                 //构建远端view
                 SurfaceViewRenderer remoteView = new SurfaceViewRenderer(MainActivity.this);
                 //初始化渲染源
@@ -403,6 +409,8 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                mVideoView.setVisibility(View.GONE);
+                mVideoView.stopPlayback();
                 ////UI线程执行
                 //移除远端view
                 SurfaceViewRenderer remoteView = (SurfaceViewRenderer) remoteViews.get(peerId);
@@ -417,5 +425,21 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         });
     }
 
+    @Override
+    public void onMirror(boolean mirroring) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mirroring) {
+                    mVideoView.setVideoPath("http://10.5.223.25/vue.mp4");
+                    mVideoView.start();
+                    mVideoView.setVisibility(View.VISIBLE);
+                } else {
+                    mVideoView.stopPlayback();
+                    mVideoView.setVisibility(View.GONE);
+                }
+            }
+        });
 
+    }
 }

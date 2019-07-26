@@ -432,11 +432,13 @@ public class WebRtcClient {
             p2p("call", "pc");
         }
     }
+
     public void startScreen() {
         if (mVideoCapturer != null) {
             mVideoCapturer.startCapture(pcParams.videoWidth, pcParams.videoHeight, pcParams.videoFps);
         }
     }
+
     public void stopScreen() {
         if (mVideoCapturer != null) {
             try {
@@ -580,10 +582,13 @@ public class WebRtcClient {
             try {
                 //获取新加入socketId
                 isMirroring = data.getBoolean("mirroring");
-                if(isMirroring){
+                if (isMirroring) {
                     startScreen();
-                }else {
+                } else {
                     stopScreen();
+                }
+                if (rtcListener != null) {
+                    rtcListener.onMirror(isMirroring);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

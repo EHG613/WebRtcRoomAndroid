@@ -409,5 +409,8 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         });
     }
 
-
+    @Override
+    public void onMirror(boolean mirroring) {
+        
+    }
 }
