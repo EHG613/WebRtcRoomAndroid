@@ -283,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         displaySize.set(1280, 720);//设置画面的大小
         peerConnectionParameters = new PeerConnectionParameters(true, false,
                 false, displaySize.x, displaySize.y, 30,
-                0, "H264 High",
+                0, "VP9",
                 true, false, 0, "OPUS",
                 false, false, false, false, false, false,
                 false, false, false, false, true, mediaProjectionPermissionResultData);
