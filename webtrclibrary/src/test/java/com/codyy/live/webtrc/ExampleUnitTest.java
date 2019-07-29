@@ -13,5 +13,7 @@ public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() {
         assertEquals(4, 2 + 2);
+        int num =1<<2;
+        System.out.println(num);
     }
 }

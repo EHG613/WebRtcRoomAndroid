@@ -280,9 +280,9 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         //获取webRtc 音视频配置参数
         Point displaySize = new Point();
         this.getWindowManager().getDefaultDisplay().getSize(displaySize);
-//        displaySize.set(480, 320);//设置画面的大小
+        displaySize.set(1280, 720);//设置画面的大小
         peerConnectionParameters = new PeerConnectionParameters(true, false,
-                false, displaySize.x, displaySize.y, 20,
+                false, displaySize.x, displaySize.y, 30,
                 0, "H264 High",
                 true, false, 0, "OPUS",
                 false, false, false, false, false, false,
