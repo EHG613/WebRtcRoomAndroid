@@ -10,11 +10,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.hardware.display.VirtualDisplay;
 import android.media.projection.MediaProjection;
-import android.media.projection.MediaProjectionManager;
 import android.media.projection.MediaProjection.Callback;
+import android.media.projection.MediaProjectionManager;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.util.DisplayMetrics;
 import android.view.Surface;
 
 import org.webrtc.CapturerObserver;
@@ -24,28 +22,23 @@ import org.webrtc.VideoCapturer;
 import org.webrtc.VideoFrame;
 import org.webrtc.VideoSink;
 
-import static android.hardware.display.DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR;
+import static android.content.Context.MEDIA_PROJECTION_SERVICE;
 import static android.hardware.display.DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC;
 
 @TargetApi(21)
 public class ScreenCapturerAndroid implements VideoCapturer, VideoSink {
-    private static final int DISPLAY_FLAGS = 3;
-    private static final int VIRTUAL_DISPLAY_DPI = 400;
+    private static final int DISPLAY_FLAGS = VIRTUAL_DISPLAY_FLAG_PUBLIC;
+    private static final int VIRTUAL_DISPLAY_DPI = 1;
     private final Intent mediaProjectionPermissionResultData;
     private final Callback mediaProjectionCallback;
     private int width;
     private int height;
-    @Nullable
     private VirtualDisplay virtualDisplay;
-    @Nullable
     private SurfaceTextureHelper surfaceTextureHelper;
-    @Nullable
     private CapturerObserver capturerObserver;
     private long numCapturedFrames;
-    @Nullable
     private MediaProjection mediaProjection;
     private boolean isDisposed;
-    @Nullable
     private MediaProjectionManager mediaProjectionManager;
 
     public ScreenCapturerAndroid(Intent mediaProjectionPermissionResultData, Callback mediaProjectionCallback) {
@@ -69,7 +62,7 @@ public class ScreenCapturerAndroid implements VideoCapturer, VideoSink {
                 throw new RuntimeException("surfaceTextureHelper not set.");
             } else {
                 this.surfaceTextureHelper = surfaceTextureHelper;
-                this.mediaProjectionManager = (MediaProjectionManager) applicationContext.getSystemService("media_projection");
+                this.mediaProjectionManager = (MediaProjectionManager) applicationContext.getSystemService(MEDIA_PROJECTION_SERVICE);
             }
         }
     }
@@ -78,15 +71,21 @@ public class ScreenCapturerAndroid implements VideoCapturer, VideoSink {
         this.checkNotDisposed();
         this.width = width;
         this.height = height;
-        this.mediaProjection = this.mediaProjectionManager.getMediaProjection(-1, this.mediaProjectionPermissionResultData);
-        this.mediaProjection.registerCallback(this.mediaProjectionCallback, this.surfaceTextureHelper.getHandler());
+        if (this.mediaProjectionManager != null && this.surfaceTextureHelper != null) {
+            this.mediaProjection = this.mediaProjectionManager.getMediaProjection(-1, this.mediaProjectionPermissionResultData);
+            if (this.mediaProjection != null)
+                this.mediaProjection.registerCallback(this.mediaProjectionCallback, this.surfaceTextureHelper.getHandler());
+        }
         this.createVirtualDisplay();
-        this.capturerObserver.onCapturerStarted(true);
-        this.surfaceTextureHelper.startListening(this);
+        if (this.capturerObserver != null)
+            this.capturerObserver.onCapturerStarted(true);
+        if (this.surfaceTextureHelper != null)
+            this.surfaceTextureHelper.startListening(this);
     }
 
     public synchronized void stopCapture() {
         this.checkNotDisposed();
+        if (this.surfaceTextureHelper == null || this.capturerObserver == null) return;
         ThreadUtils.invokeAtFrontUninterruptibly(this.surfaceTextureHelper.getHandler(), () -> {
             ScreenCapturerAndroid.this.surfaceTextureHelper.stopListening();
             ScreenCapturerAndroid.this.capturerObserver.onCapturerStopped();
@@ -112,7 +111,7 @@ public class ScreenCapturerAndroid implements VideoCapturer, VideoSink {
         this.checkNotDisposed();
         this.width = width;
         this.height = height;
-        if (this.virtualDisplay != null) {
+        if (this.virtualDisplay != null && this.surfaceTextureHelper != null) {
             ThreadUtils.invokeAtFrontUninterruptibly(this.surfaceTextureHelper.getHandler(), () -> {
                 ScreenCapturerAndroid.this.virtualDisplay.release();
                 ScreenCapturerAndroid.this.createVirtualDisplay();
@@ -121,17 +120,17 @@ public class ScreenCapturerAndroid implements VideoCapturer, VideoSink {
     }
 
     private void createVirtualDisplay() {
-        this.surfaceTextureHelper.setTextureSize(this.width, this.height);
-        this.virtualDisplay = this.mediaProjection.createVirtualDisplay("WebRTC_ScreenCapture", this.width, this.height, 1, VIRTUAL_DISPLAY_FLAG_PUBLIC, new Surface(this.surfaceTextureHelper.getSurfaceTexture()), (android.hardware.display.VirtualDisplay.Callback) null, (Handler) null);
+        if (this.surfaceTextureHelper != null && this.mediaProjection != null) {
+            this.surfaceTextureHelper.setTextureSize(this.width, this.height);
+            this.virtualDisplay = this.mediaProjection.createVirtualDisplay("WebRTC_ScreenCapture", this.width, this.height, VIRTUAL_DISPLAY_DPI, DISPLAY_FLAGS, new Surface(this.surfaceTextureHelper.getSurfaceTexture()), (android.hardware.display.VirtualDisplay.Callback) null, (Handler) null);
+        }
     }
-    private float getDensity(Context applicationContext) {
-        DisplayMetrics dm = new DisplayMetrics();
-//        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
-        return dm.density;
-    }
+
     public void onFrame(VideoFrame frame) {
         ++this.numCapturedFrames;
-        this.capturerObserver.onFrameCaptured(frame);
+        if (this.capturerObserver != null) {
+            this.capturerObserver.onFrameCaptured(frame);
+        }
     }
 
     public boolean isScreencast() {
