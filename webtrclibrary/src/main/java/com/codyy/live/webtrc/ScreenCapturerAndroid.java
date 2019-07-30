@@ -68,6 +68,7 @@ public class ScreenCapturerAndroid implements VideoCapturer, VideoSink {
     }
 
     public synchronized void startCapture(int width, int height, int ignoredFramerate) {
+        if (mediaProjection != null) return;
         this.checkNotDisposed();
         this.width = width;
         this.height = height;

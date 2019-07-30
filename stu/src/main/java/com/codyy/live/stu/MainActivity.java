@@ -431,8 +431,8 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             @Override
             public void run() {
                 if (mirroring) {
-                    mVideoView.setVideoPath("http://10.5.223.25/vue.mp4");
-                    mVideoView.start();
+//                    mVideoView.setVideoPath("http://10.5.223.25/vue.mp4");
+//                    mVideoView.start();
                     mVideoView.setVisibility(View.VISIBLE);
                 } else {
                     mVideoView.stopPlayback();
