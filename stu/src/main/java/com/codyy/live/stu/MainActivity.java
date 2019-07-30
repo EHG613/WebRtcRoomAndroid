@@ -17,6 +17,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextClock;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     private Button exitRoom;
     private Button shareDesktop;
     private VideoView mVideoView;
+    private TextClock mTextClock;
     private StateLayout stateLayout;
     private SurfaceViewRenderer localSurfaceViewRenderer;
     private LinearLayout remoteVideoLl;
@@ -82,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.activity_main);
         stateLayout = findViewById(R.id.state_layout);
+        mTextClock = findViewById(R.id.clock);
         roomName = findViewById(R.id.room);
         openCamera = findViewById(R.id.openCamera);
         openCamera.setOnClickListener(this);
@@ -431,12 +434,14 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             @Override
             public void run() {
                 if (mirroring) {
+                    mTextClock.setVisibility(View.VISIBLE);
 //                    mVideoView.setVideoPath("http://10.5.223.25/vue.mp4");
 //                    mVideoView.start();
-                    mVideoView.setVisibility(View.VISIBLE);
+//                    mVideoView.setVisibility(View.VISIBLE);
                 } else {
-                    mVideoView.stopPlayback();
-                    mVideoView.setVisibility(View.GONE);
+                    mTextClock.setVisibility(View.GONE);
+//                    mVideoView.stopPlayback();
+//                    mVideoView.setVisibility(View.GONE);
                 }
             }
         });

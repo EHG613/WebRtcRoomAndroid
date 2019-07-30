@@ -125,4 +125,18 @@
         sl:layout_constraintEnd_toStartOf="@id/ll_end"
         sl:layout_constraintStart_toStartOf="parent"
         sl:layout_constraintTop_toTopOf="parent" />
+
+    <TextClock
+        android:id="@+id/clock"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:format12Hour="yyyy/MM/dd HH:mm:ss"
+        android:format24Hour="yyyy/MM/dd HH:mm:ss"
+        android:visibility="gone"
+        android:textSize="32sp"
+        android:gravity="center"
+        sl:layout_constraintBottom_toBottomOf="parent"
+        sl:layout_constraintEnd_toStartOf="@id/ll_end"
+        sl:layout_constraintStart_toStartOf="parent"
+        sl:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>
