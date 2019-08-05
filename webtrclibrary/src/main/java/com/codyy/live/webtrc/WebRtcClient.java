@@ -425,6 +425,80 @@ public class WebRtcClient {
         }
     }
 
+    /**
+     * 移动鼠标事件
+     * @param x
+     * @param y
+     */
+    public void mouseMove(float x, float y) {
+        JSONObject content = new JSONObject();
+        try {
+            content.put("action", "move");
+            content.put("x", x);
+            content.put("y", y);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        p2pExt("action", Role.PC, content);
+    }
+
+    /**
+     * 单击事件
+     * @param x
+     * @param y
+     */
+    public void onSingleTapConfirmed(float x,float y){
+        JSONObject content = new JSONObject();
+        try {
+            content.put("action", "singleTap");
+            content.put("x", x);
+            content.put("y", y);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        p2pExt("action", Role.PC, content);
+    }
+
+    /**
+     * 双击事件
+     * @param x
+     * @param y
+     */
+    public void onDoubleTap(float x,float y){
+        JSONObject content = new JSONObject();
+        try {
+            content.put("action", "doubleTap");
+            content.put("x", x);
+            content.put("y", y);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        p2pExt("action", Role.PC, content);
+    }
+    /*用户手势事件传递*/
+    private void p2pExt(String event, String role, JSONObject content) {
+        String to = null;
+        for (Peer peer : peers.values()) {
+            if (role.equals(peer.getRole())) {
+                to = peer.getId();
+                break;
+            }
+        }
+        if (TextUtils.isEmpty(to)) return;
+        //构建信令数据并发送
+        try {
+            JSONObject message = new JSONObject();
+            message.put("room", roomId);
+            message.put("from", socketId);
+            message.put("to", to);
+            message.put("content", content);
+            //向信令服务器发送信令
+            sendMessage(event, message);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void startCapture() {
         if (mVideoCapturer != null) {
             mVideoCapturer.startCapture(pcParams.videoWidth, pcParams.videoHeight, pcParams.videoFps);

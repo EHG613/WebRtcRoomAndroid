@@ -9,7 +9,9 @@ import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -358,6 +360,8 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         remoteVideoLl.removeAllViews();
     }
 
+    private GestureDetector mGestureDetector;
+
     /* RtcListener 数据回调 */
     @Override
     public void onAddRemoteStream(String peerId, VideoTrack videoTrack) {
@@ -367,6 +371,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 ////UI线程执行
                 //构建远端view
                 SurfaceViewRenderer remoteView = new SurfaceViewRenderer(MainActivity.this);
+
                 //初始化渲染源
                 remoteView.init(rootEglBase.getEglBaseContext(), null);
                 //填充模式
@@ -377,6 +382,57 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 //控件布局
                 int width = (Integer.parseInt(DeviceUtils.getScreenWidth(MainActivity.this)) - getResources().getDimensionPixelSize(R.dimen.right_margin));
                 int height = width * 9 / 16;
+                remoteView.setLongClickable(true);
+                mGestureDetector = new GestureDetector(remoteVideoLl.getContext(), new GestureDetector.SimpleOnGestureListener() {
+//                    @Override
+//                    public boolean onSingleTapUp(MotionEvent e) {
+//                        Log.e("onSingleTapUp",e.getX()+":"+e.getY());
+//                        return super.onSingleTapUp(e);
+//                    }
+
+                    @Override
+                    public boolean onSingleTapConfirmed(MotionEvent e) {
+                        Log.e("onSingleTapConfirmed", e.getX() + ":" + e.getY());
+                        if(webRtcClient!=null){
+                            webRtcClient.onSingleTapConfirmed(getRealX(e.getX(),width),getRealY(e.getY(),height));
+                        }
+                        return super.onSingleTapConfirmed(e);
+                    }
+
+                    @Override
+                    public boolean onDoubleTap(MotionEvent e) {
+                        Log.e("onDoubleTap", e.getX() + ":" + e.getY());
+                        if(webRtcClient!=null){
+                            webRtcClient.onDoubleTap(getRealX(e.getX(),width),getRealY(e.getY(),height));
+                        }
+                        return super.onDoubleTap(e);
+                    }
+
+                    @Override
+                    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                        Log.e("onScroll", e1.getX() + ":" + e1.getY() + ";" + e2.getX() + ":" + e2.getY());
+                        return super.onScroll(e1, e2, distanceX, distanceY);
+                    }
+
+                    @Override
+                    public void onLongPress(MotionEvent e) {
+                        super.onLongPress(e);
+                        Log.e("onLongPress", e.getX() + ":" + e.getY());
+                    }
+
+                    @Override
+                    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                        Log.e("onFling", e1.getX() + ":" + e1.getY() + ";" + e2.getX() + ":" + e2.getY());
+                        return super.onFling(e1, e2, velocityX, velocityY);
+                    }
+                });
+                remoteView.setOnTouchListener((v, event) -> {
+//                    Log.e("onTouch",event.getX()+":"+event.getY());
+                    if (webRtcClient != null) {
+                        webRtcClient.mouseMove(getRealX(event.getX(), width), getRealY(event.getY(), height));
+                    }
+                    return mGestureDetector.onTouchEvent(event);
+                });
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
 //                layoutParams.topMargin = 20;
 //                layoutParams.rightMargin=120;
@@ -388,6 +444,16 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 videoTrack.addSink(remoteView);
             }
         });
+    }
+
+    private float getRealX(float currentX, int currentWidth) {
+        float x = currentX * 1920 / currentWidth;
+        return x > 1920 ? 1920 : x;
+    }
+
+    private float getRealY(float currentY, int currentHeight) {
+        float y = currentY * 1080 / currentHeight;
+        return y > 1080 ? 1080 : y;
     }
 
     @Override
@@ -411,6 +477,6 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
 
     @Override
     public void onMirror(boolean mirroring) {
-        
+
     }
 }

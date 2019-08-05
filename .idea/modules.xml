@@ -6,8 +6,6 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/WebRtcRoomAndroid.iml" filepath="$PROJECT_DIR$/.idea/WebRtcRoomAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/stu/stu.iml" filepath="$PROJECT_DIR$/stu/stu.iml" />
-      <module fileurl="file://$PROJECT_DIR$/stu/stu.iml" filepath="$PROJECT_DIR$/stu/stu.iml" />
-      <module fileurl="file://$PROJECT_DIR$/webtrclibrary/webtrclibrary.iml" filepath="$PROJECT_DIR$/webtrclibrary/webtrclibrary.iml" />
       <module fileurl="file://$PROJECT_DIR$/webtrclibrary/webtrclibrary.iml" filepath="$PROJECT_DIR$/webtrclibrary/webtrclibrary.iml" />
     </modules>
   </component>
