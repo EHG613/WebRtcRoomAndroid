@@ -1,11 +1,7 @@
 package com.dingsoft.webrtc.webrtcroom.activity;
 
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
-import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -27,8 +23,8 @@ import com.codyy.live.webtrc.PeerConnectionParameters;
 import com.codyy.live.webtrc.Role;
 import com.codyy.live.webtrc.RtcListener;
 import com.codyy.live.webtrc.WebRtcClient;
-import com.dingsoft.webrtc.webrtcroom.R;
 import com.codyy.live.webtrc.life.PortWorkLifecycle;
+import com.dingsoft.webrtc.webrtcroom.R;
 import com.fingdo.statelayout.StateLayout;
 import com.yanzhenjie.permission.Action;
 import com.yanzhenjie.permission.AndPermission;
@@ -45,12 +41,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements RtcListener, View.OnClickListener {
     //控件
     private EditText roomName;
-    private Button openCamera;
-    private Button switchCamera;
-    private Button createRoom;
-    private Button exitRoom;
-    private Button shareDesktop;
-    private Button mMirror;
+    private Button openCamera,switchCamera,createRoom,exitRoom,shareDesktop,mMirror;
+    private Button mFullScreen,mEsc,mClose,mPenOrMouse;
     private StateLayout stateLayout;
     private SurfaceViewRenderer localSurfaceViewRenderer;
     private LinearLayout remoteVideoLl;
@@ -81,6 +73,14 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                         | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.activity_main);
+        mFullScreen = findViewById(R.id.btn_fullscreen);
+        mFullScreen.setOnClickListener(this);
+        mPenOrMouse = findViewById(R.id.btn_pen_mouse);
+        mPenOrMouse.setOnClickListener(this);
+        mEsc = findViewById(R.id.btn_esc);
+        mEsc.setOnClickListener(this);
+        mClose = findViewById(R.id.btn_close);
+        mClose.setOnClickListener(this);
         stateLayout = findViewById(R.id.state_layout);
         roomName = findViewById(R.id.room);
         openCamera = findViewById(R.id.openCamera);
@@ -266,6 +266,30 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                     }
                 }
                 break;
+            case R.id.btn_fullscreen:
+                if(webRtcClient!=null){
+                    webRtcClient.onFullScreen();
+                }
+                break;
+            case R.id.btn_esc:
+                if(webRtcClient!=null){
+                    webRtcClient.onESCFullScreen();
+                }
+                break;
+            case R.id.btn_close:
+                if(webRtcClient!=null){
+                    webRtcClient.onClosePPTScreen();
+                }
+                break;
+            case R.id.btn_pen_mouse:
+                if("鼠标".equals(mPenOrMouse.getText().toString())){
+                    mPenOrMouse.setText("画笔");
+                    if(webRtcClient!=null)webRtcClient.onPPTDrawScreen("pen");
+                }else{
+                    mPenOrMouse.setText("鼠标");
+                    if(webRtcClient!=null)webRtcClient.onPPTDrawScreen("mouse");
+                }
+                break;
             default:
                 break;
         }
@@ -384,11 +408,17 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 int height = width * 9 / 16;
                 remoteView.setLongClickable(true);
                 mGestureDetector = new GestureDetector(remoteVideoLl.getContext(), new GestureDetector.SimpleOnGestureListener() {
-//                    @Override
-//                    public boolean onSingleTapUp(MotionEvent e) {
-//                        Log.e("onSingleTapUp",e.getX()+":"+e.getY());
-//                        return super.onSingleTapUp(e);
-//                    }
+                    @Override
+                    public boolean onSingleTapUp(MotionEvent e) {
+                        Log.e("onSingleTapUp",e.getX()+":"+e.getY());
+                        return super.onSingleTapUp(e);
+                    }
+
+                    @Override
+                    public boolean onDown(MotionEvent e) {
+                        Log.e("onDown",e.getX()+":"+e.getY());
+                        return super.onDown(e);
+                    }
 
                     @Override
                     public boolean onSingleTapConfirmed(MotionEvent e) {
@@ -410,7 +440,10 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
 
                     @Override
                     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                        Log.e("onScroll", e1.getX() + ":" + e1.getY() + ";" + e2.getX() + ":" + e2.getY());
+                        Log.e("onScroll", e1.getX() + ":" + e1.getY() + ";" + e2.getX() + ":" + e2.getY()+";distance x="+distanceX+";distance y="+distanceY);
+//                        if (webRtcClient != null) {
+//                            webRtcClient.mouseMove(getRealX(e2.getX(), width), getRealY(e2.getY(), height));
+//                        }
                         return super.onScroll(e1, e2, distanceX, distanceY);
                     }
 
@@ -428,9 +461,9 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 });
                 remoteView.setOnTouchListener((v, event) -> {
 //                    Log.e("onTouch",event.getX()+":"+event.getY());
-                    if (webRtcClient != null) {
-                        webRtcClient.mouseMove(getRealX(event.getX(), width), getRealY(event.getY(), height));
-                    }
+//                    if (webRtcClient != null) {
+//                        webRtcClient.mouseMove(getRealX(event.getX(), width), getRealY(event.getY(), height));
+//                    }
                     return mGestureDetector.onTouchEvent(event);
                 });
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);

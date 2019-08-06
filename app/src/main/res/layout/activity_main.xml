@@ -88,6 +88,26 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="退出" />
+        <Button
+            android:id="@+id/btn_fullscreen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="演示文档" />
+        <Button
+            android:id="@+id/btn_esc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="退出演示" />
+        <Button
+            android:id="@+id/btn_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="关闭文档" />
+        <Button
+            android:id="@+id/btn_pen_mouse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="鼠标" />
     </LinearLayout>
 
     <com.fingdo.statelayout.StateLayout

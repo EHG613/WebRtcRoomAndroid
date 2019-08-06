@@ -475,6 +475,56 @@ public class WebRtcClient {
         }
         p2pExt("action", Role.PC, content);
     }
+
+    /**
+     * 全屏PPT
+     */
+    public void onFullScreen(){
+        JSONObject content = new JSONObject();
+        try {
+            content.put("action", "fullscreen");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        p2pExt("action", Role.PC, content);
+    }
+    /**
+     * esc全屏PPT
+     */
+    public void onESCFullScreen(){
+        JSONObject content = new JSONObject();
+        try {
+            content.put("action", "esc");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        p2pExt("action", Role.PC, content);
+    }
+    /**
+     * 关闭PPT
+     */
+    public void onClosePPTScreen(){
+        JSONObject content = new JSONObject();
+        try {
+            content.put("action", "close");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        p2pExt("action", Role.PC, content);
+    }
+    /**
+     * PPT画笔
+     */
+    public void onPPTDrawScreen(String type){
+        JSONObject content = new JSONObject();
+        try {
+            content.put("action", "pptdraw");
+            content.put("type",type);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        p2pExt("action", Role.PC, content);
+    }
     /*用户手势事件传递*/
     private void p2pExt(String event, String role, JSONObject content) {
         String to = null;
