@@ -514,12 +514,32 @@ public class WebRtcClient {
     }
     /**
      * PPT画笔
+     * @param type pen or mouse
      */
     public void onPPTDrawScreen(String type){
         JSONObject content = new JSONObject();
         try {
             content.put("action", "pptdraw");
             content.put("type",type);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        p2pExt("action", Role.PC, content);
+    }
+
+    /**
+     * 演示文稿 画笔和鼠标操作
+     * @param toggle down or up
+     * @param x
+     * @param y
+     */
+    public void onDrag(String toggle,float x,float y){
+        JSONObject content = new JSONObject();
+        try {
+            content.put("action", "drag");
+            content.put("toggle",toggle);
+            content.put("x",x);
+            content.put("y",y);
         } catch (JSONException e) {
             e.printStackTrace();
         }

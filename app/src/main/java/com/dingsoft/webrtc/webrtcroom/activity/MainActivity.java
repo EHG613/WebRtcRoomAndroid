@@ -273,11 +273,15 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 break;
             case R.id.btn_esc:
                 if(webRtcClient!=null){
+                    mPenOrMouse.setText("鼠标");
+                    webRtcClient.onPPTDrawScreen("mouse");
                     webRtcClient.onESCFullScreen();
                 }
                 break;
             case R.id.btn_close:
                 if(webRtcClient!=null){
+                    mPenOrMouse.setText("鼠标");
+                    webRtcClient.onPPTDrawScreen("mouse");
                     webRtcClient.onClosePPTScreen();
                 }
                 break;
@@ -411,6 +415,9 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                     @Override
                     public boolean onSingleTapUp(MotionEvent e) {
                         Log.e("onSingleTapUp",e.getX()+":"+e.getY());
+//                        if("画笔".equals(mPenOrMouse.getText().toString())&&webRtcClient!=null){
+//                            webRtcClient.onDrag("up",getRealX(e.getX(),width),getRealY(e.getY(),height));
+//                        }
                         return super.onSingleTapUp(e);
                     }
 
@@ -461,9 +468,14 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 });
                 remoteView.setOnTouchListener((v, event) -> {
 //                    Log.e("onTouch",event.getX()+":"+event.getY());
-//                    if (webRtcClient != null) {
-//                        webRtcClient.mouseMove(getRealX(event.getX(), width), getRealY(event.getY(), height));
-//                    }
+                    if("画笔".equals(mPenOrMouse.getText().toString())&&webRtcClient!=null){
+                        if(event.getAction()==MotionEvent.ACTION_DOWN) {
+                            webRtcClient.onDrag("down", getRealX(event.getX(), width), getRealY(event.getY(), height));
+                        }else if(event.getAction()==MotionEvent.ACTION_UP){
+                            webRtcClient.onDrag("up", getRealX(event.getX(), width), getRealY(event.getY(), height));
+                        }
+                        webRtcClient.mouseMove(getRealX(event.getX(), width), getRealY(event.getY(), height));
+                    }
                     return mGestureDetector.onTouchEvent(event);
                 });
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
