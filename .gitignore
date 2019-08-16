@@ -41,7 +41,7 @@ Thumbs.db
 # Android Studio
 .idea
 *.iml
-
+/.idea
 # Old-style IDEA project files
 *.ipr
 *.iws

@@ -7,7 +7,10 @@ import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
+import android.support.constraint.Group;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -23,6 +26,7 @@ import android.widget.VideoView;
 
 import androidx.work.WorkInfo;
 
+import com.blankj.utilcode.util.KeyboardUtils;
 import com.codyy.devicelibrary.DeviceUtils;
 import com.codyy.live.webtrc.PeerConnectionParameters;
 import com.codyy.live.webtrc.Role;
@@ -45,7 +49,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements RtcListener, View.OnClickListener {
 
     //控件
-    private EditText roomName;
+    private EditText roomName, et1, et2, et3, et4, et5, et6;
+    private Group mGroup;
     private Button openCamera;
     private Button switchCamera;
     private Button createRoom;
@@ -83,6 +88,114 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                         | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.activity_main);
+        mGroup = findViewById(R.id.group);
+        et1 = findViewById(R.id.et1);
+        et2 = findViewById(R.id.et2);
+        et3 = findViewById(R.id.et3);
+        et4 = findViewById(R.id.et4);
+        et5 = findViewById(R.id.et5);
+        et6 = findViewById(R.id.et6);
+        et1.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (count == 1) et2.requestFocus();
+                getNumLength(et1, et2, et3, et4, et5, et6);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        et2.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (count == 1) et3.requestFocus();
+                getNumLength(et1, et2, et3, et4, et5, et6);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        et3.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (count == 1) et4.requestFocus();
+                getNumLength(et1, et2, et3, et4, et5, et6);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        et4.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (count == 1) et5.requestFocus();
+                getNumLength(et1, et2, et3, et4, et5, et6);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        et5.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (count == 1) et6.requestFocus();
+                getNumLength(et1, et2, et3, et4, et5, et6);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        et6.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                getNumLength(et1, et2, et3, et4, et5, et6);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         stateLayout = findViewById(R.id.state_layout);
         mTextClock = findViewById(R.id.clock);
         roomName = findViewById(R.id.room);
@@ -119,7 +232,13 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         });
         startScreenCapture();
     }
-
+    private void getNumLength(EditText... editText) {
+        int i = 0;
+        for (EditText text : editText) {
+            i += text.getText().length();
+        }
+        createRoom.setEnabled(i == 6);
+    }
     private static final int CAPTURE_PERMISSION_REQUEST_CODE = 1;
 
     @TargetApi(21)
@@ -152,8 +271,8 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 createWebRtcClient(getString(R.string.host_addr, status.getOutputData().getString("ip"), status.getOutputData().getString("port")));
                 Log.e("info", getString(R.string.host_addr, status.getOutputData().getString("ip"), status.getOutputData().getString("port")));
                 openCamera.performClick();
-                createRoom.performClick();
-                stateLayout.showContentView();
+//                createRoom.performClick();
+//                stateLayout.showContentView();
             }
 
             @Override
@@ -233,7 +352,9 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 break;
             case R.id.create:
                 //创建并加入聊天室
-                String roomId = roomName.getText().toString();
+                KeyboardUtils.hideSoftInput(this);
+                //创建并加入聊天室
+                String roomId = et1.getText().toString() + et2.getText().toString() + et3.getText().toString() + et4.getText().toString() + et5.getText().toString() + et6.getText().toString();
                 if (isCameraOpen) {
                     webRtcClient.createAndJoinRoom(roomId, Role.CLIENT);
                     createRoom.setEnabled(false);
@@ -446,5 +567,19 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             }
         });
 
+    }
+
+    @Override
+    public void onEmpty() {
+        runOnUiThread(() -> Toast.makeText(getApplicationContext(), "课堂号错误，请重试", Toast.LENGTH_LONG).show());
+    }
+
+    @Override
+    public void onJoin() {
+        runOnUiThread(() -> {
+            createRoom.setEnabled(false);
+            mGroup.setVisibility(View.GONE);
+            stateLayout.showContentView();
+        });
     }
 }

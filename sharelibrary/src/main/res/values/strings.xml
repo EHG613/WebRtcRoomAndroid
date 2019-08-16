@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Share Library</string>
+    <string name="host_addr">https://%s:%s</string>
+</resources>
