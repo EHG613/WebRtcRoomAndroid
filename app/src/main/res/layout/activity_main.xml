@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:sl="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -59,6 +60,7 @@
             android:layout_marginRight="4dp"
             android:text="开始发流"
             android:visibility="visible" />
+
         <Button
             android:id="@+id/desktop"
             android:layout_width="wrap_content"
@@ -66,6 +68,7 @@
             android:layout_marginRight="4dp"
             android:text="共享桌面"
             android:visibility="visible" />
+
         <Button
             android:id="@+id/mirror"
             android:layout_width="wrap_content"
@@ -74,35 +77,31 @@
             android:text="镜像"
             android:visibility="visible" />
 
-        <!-- 创建并加入-->
-        <Button
-            android:id="@+id/create"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dp"
-            android:text="进入"
-            android:visibility="gone" />
         <!-- 退出-->
         <Button
             android:id="@+id/exit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="退出" />
+
         <Button
             android:id="@+id/btn_fullscreen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="演示文档" />
+
         <Button
             android:id="@+id/btn_esc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="退出演示" />
+
         <Button
             android:id="@+id/btn_close"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="关闭文档" />
+
         <Button
             android:id="@+id/btn_pen_mouse"
             android:layout_width="wrap_content"
@@ -139,4 +138,144 @@
         </LinearLayout>
     </com.fingdo.statelayout.StateLayout>
 
+    <View
+        android:id="@+id/v_num"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/white"
+        sl:layout_constraintBottom_toBottomOf="parent"
+        sl:layout_constraintEnd_toEndOf="parent"
+        sl:layout_constraintStart_toStartOf="parent"
+        sl:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/et1"
+        android:layout_width="32dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_num"
+        android:gravity="center"
+        android:inputType="number"
+        android:maxLength="1"
+        android:textSize="20sp"
+        sl:layout_constraintBottom_toBottomOf="@id/guideline"
+        sl:layout_constraintDimensionRatio="9:16"
+        sl:layout_constraintEnd_toStartOf="@id/et2"
+        sl:layout_constraintHorizontal_chainStyle="packed"
+        sl:layout_constraintStart_toStartOf="@id/v_num"
+        sl:layout_constraintTop_toTopOf="@id/v_num" />
+
+    <EditText
+        android:id="@+id/et2"
+        android:layout_width="32dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/bg_num"
+        android:gravity="center"
+        android:inputType="number"
+        android:maxLength="1"
+        android:textSize="20sp"
+        sl:layout_constraintBottom_toBottomOf="@id/guideline"
+        sl:layout_constraintDimensionRatio="9:16"
+        sl:layout_constraintEnd_toStartOf="@id/et3"
+        sl:layout_constraintStart_toEndOf="@id/et1"
+        sl:layout_constraintTop_toTopOf="@id/v_num" />
+
+    <EditText
+        android:id="@+id/et3"
+        android:layout_width="32dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/bg_num"
+        android:gravity="center"
+        android:inputType="number"
+        android:maxLength="1"
+        android:textSize="20sp"
+        sl:layout_constraintBottom_toBottomOf="@id/guideline"
+        sl:layout_constraintDimensionRatio="9:16"
+        sl:layout_constraintEnd_toStartOf="@id/et4"
+        sl:layout_constraintStart_toEndOf="@id/et2"
+        sl:layout_constraintTop_toTopOf="@id/v_num" />
+
+    <EditText
+        android:id="@+id/et4"
+        android:layout_width="32dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/bg_num"
+        android:gravity="center"
+        android:inputType="number"
+        android:maxLength="1"
+        android:textSize="20sp"
+        sl:layout_constraintBottom_toBottomOf="@id/guideline"
+        sl:layout_constraintDimensionRatio="9:16"
+        sl:layout_constraintEnd_toStartOf="@id/et5"
+        sl:layout_constraintStart_toEndOf="@id/et3"
+        sl:layout_constraintTop_toTopOf="@id/v_num" />
+
+    <EditText
+        android:id="@+id/et5"
+        android:layout_width="32dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/bg_num"
+        android:gravity="center"
+        android:inputType="number"
+        android:maxLength="1"
+        android:textSize="20sp"
+        sl:layout_constraintBottom_toBottomOf="@id/guideline"
+        sl:layout_constraintDimensionRatio="9:16"
+        sl:layout_constraintEnd_toStartOf="@id/et6"
+        sl:layout_constraintStart_toEndOf="@id/et4"
+        sl:layout_constraintTop_toTopOf="@id/v_num" />
+
+    <EditText
+        android:id="@+id/et6"
+        android:layout_width="32dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/bg_num"
+        android:gravity="center"
+        android:inputType="number"
+        android:maxLength="1"
+        android:textSize="20sp"
+        sl:layout_constraintBottom_toBottomOf="@id/guideline"
+        sl:layout_constraintDimensionRatio="9:16"
+        sl:layout_constraintEnd_toEndOf="parent"
+        sl:layout_constraintStart_toEndOf="@id/et5"
+        sl:layout_constraintTop_toTopOf="@id/v_num"
+        tools:text="1" />
+    <!-- 创建并加入-->
+    <Button
+        android:id="@+id/create"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="进入课堂"
+        android:visibility="visible"
+        sl:layout_constraintEnd_toEndOf="@id/v_num"
+        sl:layout_constraintStart_toStartOf="@id/v_num"
+        sl:layout_constraintTop_toBottomOf="@id/et1" />
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="课堂号"
+        android:visibility="visible"
+        sl:layout_constraintBottom_toTopOf="@id/et1"
+        sl:layout_constraintEnd_toEndOf="@id/v_num"
+        sl:layout_constraintStart_toStartOf="@id/v_num" />
+
+    <android.support.constraint.Group
+        android:id="@+id/group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        sl:constraint_referenced_ids="v_num,et1,et2,et3,et4,et5,et6,create,tv_title" />
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:orientation="horizontal"
+        sl:layout_constraintGuide_percent="0.67"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 </android.support.constraint.ConstraintLayout>

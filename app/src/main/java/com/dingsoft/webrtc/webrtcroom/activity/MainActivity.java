@@ -2,8 +2,12 @@ package com.dingsoft.webrtc.webrtcroom.activity;
 
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
+import android.hardware.Camera;
 import android.os.Bundle;
+import android.support.constraint.Group;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
@@ -18,6 +22,7 @@ import android.widget.Toast;
 
 import androidx.work.WorkInfo;
 
+import com.blankj.utilcode.util.KeyboardUtils;
 import com.codyy.devicelibrary.DeviceUtils;
 import com.codyy.live.webtrc.PeerConnectionParameters;
 import com.codyy.live.webtrc.Role;
@@ -35,14 +40,17 @@ import org.webrtc.RendererCommon;
 import org.webrtc.SurfaceViewRenderer;
 import org.webrtc.VideoTrack;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements RtcListener, View.OnClickListener {
     //控件
-    private EditText roomName;
-    private Button openCamera,switchCamera,createRoom,exitRoom,shareDesktop,mMirror;
-    private Button mFullScreen,mEsc,mClose,mPenOrMouse;
+    private EditText roomName, et1, et2, et3, et4, et5, et6;
+    private Group mGroup;
+    private Button openCamera, switchCamera, createRoom, exitRoom, shareDesktop, mMirror;
+    private Button mFullScreen, mEsc, mClose, mPenOrMouse;
     private StateLayout stateLayout;
     private SurfaceViewRenderer localSurfaceViewRenderer;
     private LinearLayout remoteVideoLl;
@@ -74,6 +82,114 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.activity_main);
         mFullScreen = findViewById(R.id.btn_fullscreen);
+        mGroup = findViewById(R.id.group);
+        et1 = findViewById(R.id.et1);
+        et2 = findViewById(R.id.et2);
+        et3 = findViewById(R.id.et3);
+        et4 = findViewById(R.id.et4);
+        et5 = findViewById(R.id.et5);
+        et6 = findViewById(R.id.et6);
+        et1.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (count == 1) et2.requestFocus();
+                getNumLength(et1, et2, et3, et4, et5, et6);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        et2.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (count == 1) et3.requestFocus();
+                getNumLength(et1, et2, et3, et4, et5, et6);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        et3.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (count == 1) et4.requestFocus();
+                getNumLength(et1, et2, et3, et4, et5, et6);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        et4.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (count == 1) et5.requestFocus();
+                getNumLength(et1, et2, et3, et4, et5, et6);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        et5.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (count == 1) et6.requestFocus();
+                getNumLength(et1, et2, et3, et4, et5, et6);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        et6.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                getNumLength(et1, et2, et3, et4, et5, et6);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         mFullScreen.setOnClickListener(this);
         mPenOrMouse = findViewById(R.id.btn_pen_mouse);
         mPenOrMouse.setOnClickListener(this);
@@ -89,6 +205,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         switchCamera.setOnClickListener(this);
         createRoom = findViewById(R.id.create);
         createRoom.setOnClickListener(this);
+        createRoom.setEnabled(false);
         exitRoom = findViewById(R.id.exit);
         exitRoom.setOnClickListener(this);
         shareDesktop = findViewById(R.id.desktop);
@@ -118,6 +235,13 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         initCall();
     }
 
+    private void getNumLength(EditText... editText) {
+        int i = 0;
+        for (EditText text : editText) {
+            i += text.getText().length();
+        }
+        createRoom.setEnabled(i == 6);
+    }
 
     private void initCall() {
         portWorkLifecycle = new PortWorkLifecycle(this);
@@ -128,8 +252,8 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 createWebRtcClient(getString(R.string.host_addr, status.getOutputData().getString("ip"), status.getOutputData().getString("port")));
                 Log.e("info", getString(R.string.host_addr, status.getOutputData().getString("ip"), status.getOutputData().getString("port")));
                 openCamera.performClick();
-                createRoom.performClick();
-                stateLayout.showContentView();
+//                createRoom.performClick();
+//                stateLayout.showContentView();
             }
 
             @Override
@@ -208,14 +332,15 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 switchCamera();
                 break;
             case R.id.create:
+                KeyboardUtils.hideSoftInput(this);
                 //创建并加入聊天室
-                String roomId = roomName.getText().toString();
+                String roomId = et1.getText().toString() + et2.getText().toString() + et3.getText().toString() + et4.getText().toString() + et5.getText().toString() + et6.getText().toString();
                 if (isCameraOpen) {
                     webRtcClient.createAndJoinRoom(roomId, Role.CTRL);
-                    createRoom.setEnabled(false);
                 } else {
                     Toast.makeText(this, "请先开启摄像头", Toast.LENGTH_SHORT).show();
                 }
+
                 break;
             case R.id.exit:
                 //退出聊天室
@@ -267,31 +392,31 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 }
                 break;
             case R.id.btn_fullscreen:
-                if(webRtcClient!=null){
+                if (webRtcClient != null) {
                     webRtcClient.onFullScreen();
                 }
                 break;
             case R.id.btn_esc:
-                if(webRtcClient!=null){
+                if (webRtcClient != null) {
                     mPenOrMouse.setText("鼠标");
                     webRtcClient.onPPTDrawScreen("mouse");
                     webRtcClient.onESCFullScreen();
                 }
                 break;
             case R.id.btn_close:
-                if(webRtcClient!=null){
+                if (webRtcClient != null) {
                     mPenOrMouse.setText("鼠标");
                     webRtcClient.onPPTDrawScreen("mouse");
                     webRtcClient.onClosePPTScreen();
                 }
                 break;
             case R.id.btn_pen_mouse:
-                if("鼠标".equals(mPenOrMouse.getText().toString())){
+                if ("鼠标".equals(mPenOrMouse.getText().toString())) {
                     mPenOrMouse.setText("画笔");
-                    if(webRtcClient!=null)webRtcClient.onPPTDrawScreen("pen");
-                }else{
+                    if (webRtcClient != null) webRtcClient.onPPTDrawScreen("pen");
+                } else {
                     mPenOrMouse.setText("鼠标");
-                    if(webRtcClient!=null)webRtcClient.onPPTDrawScreen("mouse");
+                    if (webRtcClient != null) webRtcClient.onPPTDrawScreen("mouse");
                 }
                 break;
             default:
@@ -301,16 +426,86 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
 
     //创建配置参数
     private void createPeerConnectionParameters() {
+        getCameraInfo();
         //获取webRtc 音视频配置参数
         Point displaySize = new Point();
         this.getWindowManager().getDefaultDisplay().getSize(displaySize);
-        displaySize.set(480, 320);//设置画面的大小
+        Log.i("displaySize:", displaySize.x + "*" + displaySize.y);
+        displaySize.set(1280, 720);//设置画面的大小
         peerConnectionParameters = new PeerConnectionParameters(true, false,
                 false, displaySize.x, displaySize.y, 20,
                 0, "H264 High",
                 true, false, 0, "OPUS",
                 false, false, false, false, false, false,
                 false, false, false, false);
+    }
+
+    public static List<Camera.Size> supportedVideoSizes;
+    public static List<Camera.Size> previewSizes;
+
+    public String getCameraInfo() {
+
+        int cameracount = 0;//摄像头数量
+        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();  //获取摄像头信息
+        cameracount = Camera.getNumberOfCameras();
+        Log.i("CameraTest", "摄像头数量" + String.valueOf(cameracount));
+        for (int cameraId = 0; cameraId < Camera.getNumberOfCameras(); cameraId++) {
+            Camera.getCameraInfo(cameraId, cameraInfo);
+            Camera camera = Camera.open(cameraId); //开启摄像头获得一个Camera的实例
+            Camera.Parameters params = camera.getParameters();  //通过getParameters获取参数
+            supportedVideoSizes = params.getSupportedPictureSizes();
+            previewSizes = params.getSupportedPreviewSizes();
+            camera.release();//释放摄像头
+
+            //重新排列后设下摄像头预设分辨率在所有分辨率列表中的地址，用以选择最佳分辨率（保证适配不出错）
+            int index = bestVideoSize(previewSizes.get(0).width);
+            Log.i("CameraTest", "预览分辨率地址: " + index + " " + supportedVideoSizes.get(index).width + "x" + supportedVideoSizes.get(index).height);
+            if (null != previewSizes && previewSizes.size() > 0) {  //判断是否获取到值，否则会报空对象
+                Log.i("CameraTest", "摄像头最高分辨率宽: " + String.valueOf(supportedVideoSizes.get(0).width));  //降序后取最高值，返回的是int类型
+                Log.i("CameraTest", "摄像头最高分辨率高: " + String.valueOf(supportedVideoSizes.get(0).height));
+                Log.i("CameraTest", "摄像头分辨率全部: " + cameraSizeToSting(supportedVideoSizes));
+            } else {
+                Log.i("CameraTest", "没取到值啊什么鬼");
+                Log.i("CameraTest", "摄像头预览分辨率: " + String.valueOf(previewSizes.get(0).width));
+            }
+        }
+        return cameraSizeToSting(supportedVideoSizes);
+    }
+
+    //重新排列获取到的分辨率列表
+    public static int bestVideoSize(int _wid) {
+
+        //降序排列
+        Collections.sort(supportedVideoSizes, new Comparator<Camera.Size>() {
+            @Override
+            public int compare(Camera.Size lhs, Camera.Size rhs) {
+                if (lhs.width > rhs.width) {
+                    return -1;
+                } else if (lhs.width == rhs.width) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            }
+        });
+        for (int i = 0; i < supportedVideoSizes.size(); i++) {
+            Log.e("supportedVideoSize", supportedVideoSizes.get(i).width + "<" + _wid);
+            if (supportedVideoSizes.get(i).width < _wid) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    //分辨率格式化输出String值
+    public static String cameraSizeToSting(Iterable<Camera.Size> sizes) {
+        StringBuilder s = new StringBuilder();
+        for (Camera.Size size : sizes) {
+            if (s.length() != 0)
+                s.append(",\n");
+            s.append(size.width).append('x').append(size.height);
+        }
+        return s.toString();
     }
 
     //创建webRtcClient
@@ -414,7 +609,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 mGestureDetector = new GestureDetector(remoteVideoLl.getContext(), new GestureDetector.SimpleOnGestureListener() {
                     @Override
                     public boolean onSingleTapUp(MotionEvent e) {
-                        Log.e("onSingleTapUp",e.getX()+":"+e.getY());
+                        Log.e("onSingleTapUp", e.getX() + ":" + e.getY());
 //                        if("画笔".equals(mPenOrMouse.getText().toString())&&webRtcClient!=null){
 //                            webRtcClient.onDrag("up",getRealX(e.getX(),width),getRealY(e.getY(),height));
 //                        }
@@ -423,15 +618,15 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
 
                     @Override
                     public boolean onDown(MotionEvent e) {
-                        Log.e("onDown",e.getX()+":"+e.getY());
+                        Log.e("onDown", e.getX() + ":" + e.getY());
                         return super.onDown(e);
                     }
 
                     @Override
                     public boolean onSingleTapConfirmed(MotionEvent e) {
                         Log.e("onSingleTapConfirmed", e.getX() + ":" + e.getY());
-                        if(webRtcClient!=null){
-                            webRtcClient.onSingleTapConfirmed(getRealX(e.getX(),width),getRealY(e.getY(),height));
+                        if (webRtcClient != null) {
+                            webRtcClient.onSingleTapConfirmed(getRealX(e.getX(), width), getRealY(e.getY(), height));
                         }
                         return super.onSingleTapConfirmed(e);
                     }
@@ -439,15 +634,15 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                     @Override
                     public boolean onDoubleTap(MotionEvent e) {
                         Log.e("onDoubleTap", e.getX() + ":" + e.getY());
-                        if(webRtcClient!=null){
-                            webRtcClient.onDoubleTap(getRealX(e.getX(),width),getRealY(e.getY(),height));
+                        if (webRtcClient != null) {
+                            webRtcClient.onDoubleTap(getRealX(e.getX(), width), getRealY(e.getY(), height));
                         }
                         return super.onDoubleTap(e);
                     }
 
                     @Override
                     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                        Log.e("onScroll", e1.getX() + ":" + e1.getY() + ";" + e2.getX() + ":" + e2.getY()+";distance x="+distanceX+";distance y="+distanceY);
+                        Log.e("onScroll", e1.getX() + ":" + e1.getY() + ";" + e2.getX() + ":" + e2.getY() + ";distance x=" + distanceX + ";distance y=" + distanceY);
 //                        if (webRtcClient != null) {
 //                            webRtcClient.mouseMove(getRealX(e2.getX(), width), getRealY(e2.getY(), height));
 //                        }
@@ -468,10 +663,10 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 });
                 remoteView.setOnTouchListener((v, event) -> {
 //                    Log.e("onTouch",event.getX()+":"+event.getY());
-                    if("画笔".equals(mPenOrMouse.getText().toString())&&webRtcClient!=null){
-                        if(event.getAction()==MotionEvent.ACTION_DOWN) {
+                    if ("画笔".equals(mPenOrMouse.getText().toString()) && webRtcClient != null) {
+                        if (event.getAction() == MotionEvent.ACTION_DOWN) {
                             webRtcClient.onDrag("down", getRealX(event.getX(), width), getRealY(event.getY(), height));
-                        }else if(event.getAction()==MotionEvent.ACTION_UP){
+                        } else if (event.getAction() == MotionEvent.ACTION_UP) {
                             webRtcClient.onDrag("up", getRealX(event.getX(), width), getRealY(event.getY(), height));
                         }
                         webRtcClient.mouseMove(getRealX(event.getX(), width), getRealY(event.getY(), height));
@@ -523,5 +718,19 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     @Override
     public void onMirror(boolean mirroring) {
 
+    }
+
+    @Override
+    public void onEmpty() {
+        runOnUiThread(() -> Toast.makeText(getApplicationContext(), "课堂号错误，请重试", Toast.LENGTH_LONG).show());
+    }
+
+    @Override
+    public void onJoin() {
+        runOnUiThread(() -> {
+            createRoom.setEnabled(false);
+            mGroup.setVisibility(View.GONE);
+            stateLayout.showContentView();
+        });
     }
 }

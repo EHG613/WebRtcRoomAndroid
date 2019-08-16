@@ -52,4 +52,5 @@ dependencies {
     implementation 'com.github.codyy-mobile:DeviceUtils:0.0.3'
     implementation 'com.github.fingdo:stateLayout:1.0.4'
     implementation project(':webtrclibrary')
+    implementation 'com.blankj:utilcode:1.25.8'
 }

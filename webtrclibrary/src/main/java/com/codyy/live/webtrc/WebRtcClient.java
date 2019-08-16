@@ -5,7 +5,6 @@ import android.media.projection.MediaProjection;
 import android.text.TextUtils;
 import android.util.Log;
 
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -248,6 +247,7 @@ public class WebRtcClient {
             ////设置消息监听
             //created [id,room,peers]
             client.on("created", createdListener);
+            client.on("empty", emptyListener);
             //joined [id,room]
             client.on("joined", joinedListener);
             client.on("mirroring", mirroringListener);
@@ -671,6 +671,9 @@ public class WebRtcClient {
         public void call(Object... args) {
             JSONObject data = (JSONObject) args[0];
             Log.d(TAG, "created:" + data);
+            if(rtcListener!=null){
+                rtcListener.onJoin();
+            }
             try {
                 //设置socket id
                 socketId = data.getString("id");
@@ -714,6 +717,17 @@ public class WebRtcClient {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
+    };
+    //joined [id,room]
+    private Emitter.Listener emptyListener = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            JSONObject data = (JSONObject) args[0];
+            Log.d(TAG, "joined:" + data);
+           if(rtcListener!=null){
+               rtcListener.onEmpty();
+           }
         }
     };
     public static boolean isMirroring;

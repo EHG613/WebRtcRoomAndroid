@@ -16,4 +16,14 @@ public interface RtcListener {
     void onRemoveRemoteStream(String peerId);
 
     void onMirror(boolean mirroring);
+
+    /**
+     * 课堂号不存在
+     */
+    void onEmpty();
+
+    /**
+     * 加入课堂成功
+     */
+    void onJoin();
 }
