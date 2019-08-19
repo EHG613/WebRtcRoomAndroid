@@ -107,6 +107,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="鼠标" />
+        <Button
+            android:id="@+id/btn_res"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="资源" />
     </LinearLayout>
 
     <com.fingdo.statelayout.StateLayout
@@ -270,6 +275,7 @@
     <android.support.constraint.Group
         android:id="@+id/group"
         android:layout_width="wrap_content"
+        tools:visibility="gone"
         android:layout_height="wrap_content"
         sl:constraint_referenced_ids="v_num,et1,et2,et3,et4,et5,et6,create,tv_title" />
     <android.support.constraint.Guideline

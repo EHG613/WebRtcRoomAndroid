@@ -1,5 +1,6 @@
 package com.dingsoft.webrtc.webrtcroom.activity;
 
+import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.hardware.Camera;
@@ -35,6 +36,9 @@ import com.yanzhenjie.permission.Action;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.Permission;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.webrtc.EglBase;
 import org.webrtc.RendererCommon;
 import org.webrtc.SurfaceViewRenderer;
@@ -50,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     private EditText roomName, et1, et2, et3, et4, et5, et6;
     private Group mGroup;
     private Button openCamera, switchCamera, createRoom, exitRoom, shareDesktop, mMirror;
-    private Button mFullScreen, mEsc, mClose, mPenOrMouse;
+    private Button mFullScreen, mEsc, mClose, mPenOrMouse, mBtnRes;
     private StateLayout stateLayout;
     private SurfaceViewRenderer localSurfaceViewRenderer;
     private LinearLayout remoteVideoLl;
@@ -72,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(
                 WindowManager.LayoutParams.FLAG_FULLSCREEN
@@ -82,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.activity_main);
         mFullScreen = findViewById(R.id.btn_fullscreen);
+        mBtnRes = findViewById(R.id.btn_res);
+        mBtnRes.setOnClickListener(this);
         mGroup = findViewById(R.id.group);
         et1 = findViewById(R.id.et1);
         et2 = findViewById(R.id.et2);
@@ -282,6 +289,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        EventBus.getDefault().unregister(this);
         //数据销毁
         localSurfaceViewRenderer.release();
         localSurfaceViewRenderer = null;
@@ -418,6 +426,9 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                     mPenOrMouse.setText("鼠标");
                     if (webRtcClient != null) webRtcClient.onPPTDrawScreen("mouse");
                 }
+                break;
+            case R.id.btn_res:
+                startActivity(new Intent(this, ResActivity.class));
                 break;
             default:
                 break;
@@ -732,5 +743,12 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             mGroup.setVisibility(View.GONE);
             stateLayout.showContentView();
         });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(ResPathEvent event) {
+        if (webRtcClient != null) {
+            webRtcClient.getResPath(event.getPath());
+        }
     }
 }

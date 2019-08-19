@@ -248,6 +248,7 @@ public class WebRtcClient {
             //created [id,room,peers]
             client.on("created", createdListener);
             client.on("empty", emptyListener);
+            client.on("res", resListener);
             //joined [id,room]
             client.on("joined", joinedListener);
             client.on("mirroring", mirroringListener);
@@ -369,7 +370,7 @@ public class WebRtcClient {
     public void shareDesktop() {
         if (mVideoCapturer != null) {
             try {
-                p2p("desktop", "pc");
+                p2p("desktop", Role.PC);
                 mVideoCapturer.stopCapture();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -383,7 +384,7 @@ public class WebRtcClient {
     public void closeDesktop() {
         if (mVideoCapturer != null) {
             try {
-                p2p("closedesktop", "pc");
+                p2p("closedesktop", Role.PC);
                 mVideoCapturer.stopCapture();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -394,7 +395,7 @@ public class WebRtcClient {
     public void stopCapture() {
         if (mVideoCapturer != null) {
             try {
-                p2p("endcall", "pc");
+                p2p("endcall", Role.PC);
                 mVideoCapturer.stopCapture();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -427,6 +428,7 @@ public class WebRtcClient {
 
     /**
      * 移动鼠标事件
+     *
      * @param x
      * @param y
      */
@@ -444,10 +446,11 @@ public class WebRtcClient {
 
     /**
      * 单击事件
+     *
      * @param x
      * @param y
      */
-    public void onSingleTapConfirmed(float x,float y){
+    public void onSingleTapConfirmed(float x, float y) {
         JSONObject content = new JSONObject();
         try {
             content.put("action", "singleTap");
@@ -461,10 +464,11 @@ public class WebRtcClient {
 
     /**
      * 双击事件
+     *
      * @param x
      * @param y
      */
-    public void onDoubleTap(float x,float y){
+    public void onDoubleTap(float x, float y) {
         JSONObject content = new JSONObject();
         try {
             content.put("action", "doubleTap");
@@ -479,7 +483,7 @@ public class WebRtcClient {
     /**
      * 全屏PPT
      */
-    public void onFullScreen(){
+    public void onFullScreen() {
         JSONObject content = new JSONObject();
         try {
             content.put("action", "fullscreen");
@@ -488,10 +492,11 @@ public class WebRtcClient {
         }
         p2pExt("action", Role.PC, content);
     }
+
     /**
      * esc全屏PPT
      */
-    public void onESCFullScreen(){
+    public void onESCFullScreen() {
         JSONObject content = new JSONObject();
         try {
             content.put("action", "esc");
@@ -500,10 +505,11 @@ public class WebRtcClient {
         }
         p2pExt("action", Role.PC, content);
     }
+
     /**
      * 关闭PPT
      */
-    public void onClosePPTScreen(){
+    public void onClosePPTScreen() {
         JSONObject content = new JSONObject();
         try {
             content.put("action", "close");
@@ -512,15 +518,17 @@ public class WebRtcClient {
         }
         p2pExt("action", Role.PC, content);
     }
+
     /**
      * PPT画笔
+     *
      * @param type pen or mouse
      */
-    public void onPPTDrawScreen(String type){
+    public void onPPTDrawScreen(String type) {
         JSONObject content = new JSONObject();
         try {
             content.put("action", "pptdraw");
-            content.put("type",type);
+            content.put("type", type);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -529,22 +537,39 @@ public class WebRtcClient {
 
     /**
      * 演示文稿 画笔和鼠标操作
+     *
      * @param toggle down or up
      * @param x
      * @param y
      */
-    public void onDrag(String toggle,float x,float y){
+    public void onDrag(String toggle, float x, float y) {
         JSONObject content = new JSONObject();
         try {
             content.put("action", "drag");
-            content.put("toggle",toggle);
-            content.put("x",x);
-            content.put("y",y);
+            content.put("toggle", toggle);
+            content.put("x", x);
+            content.put("y", y);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         p2pExt("action", Role.PC, content);
     }
+
+    /**
+     * 请求资源列表
+     * @param path
+     */
+    public void getResPath(String path) {
+        JSONObject content = new JSONObject();
+        try {
+            content.put("action", "getList");
+            content.put("path", path);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        p2pExt("res", Role.PC, content);
+    }
+
     /*用户手势事件传递*/
     private void p2pExt(String event, String role, JSONObject content) {
         String to = null;
@@ -671,7 +696,7 @@ public class WebRtcClient {
         public void call(Object... args) {
             JSONObject data = (JSONObject) args[0];
             Log.d(TAG, "created:" + data);
-            if(rtcListener!=null){
+            if (rtcListener != null) {
                 rtcListener.onJoin();
             }
             try {
@@ -725,9 +750,16 @@ public class WebRtcClient {
         public void call(Object... args) {
             JSONObject data = (JSONObject) args[0];
             Log.d(TAG, "joined:" + data);
-           if(rtcListener!=null){
-               rtcListener.onEmpty();
-           }
+            if (rtcListener != null) {
+                rtcListener.onEmpty();
+            }
+        }
+    };
+    private Emitter.Listener resListener = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            JSONObject data = (JSONObject) args[0];
+            Log.d(TAG, "res:" + data);
         }
     };
     public static boolean isMirroring;

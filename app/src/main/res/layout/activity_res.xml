@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="资源"
+        app:titleTextColor="@android:color/white" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.2" />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <RadioGroup
+        android:id="@+id/rg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="1dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <RadioButton
+            android:id="@+id/rb_download"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/drawable_res_item"
+            android:button="@null"
+            android:gravity="center"
+            android:text="下载"
+            tools:checked="true" />
+
+        <RadioButton
+            android:id="@+id/rb_documents"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/drawable_res_item"
+            android:button="@null"
+            android:gravity="center"
+            android:text="文档" />
+
+        <RadioButton
+            android:id="@+id/rb_desktop"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/drawable_res_item"
+            android:button="@null"
+            android:gravity="center"
+            android:text="桌面" />
+
+        <RadioButton
+            android:id="@+id/rb_my_device"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/drawable_res_item"
+            android:button="@null"
+            android:gravity="center"
+            android:text="我的设备" />
+    </RadioGroup>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+</android.support.constraint.ConstraintLayout>
