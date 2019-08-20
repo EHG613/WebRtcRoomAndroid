@@ -1,5 +1,6 @@
 package com.codyy.live.webtrc;
 
+import org.json.JSONObject;
 import org.webrtc.VideoTrack;
 
 /**
@@ -26,4 +27,10 @@ public interface RtcListener {
      * 加入课堂成功
      */
     void onJoin();
+
+    /**
+     * 资源地址返回
+     * @param jsonObject
+     */
+    void onResResult(JSONObject jsonObject);
 }

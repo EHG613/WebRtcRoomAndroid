@@ -25,6 +25,9 @@ import androidx.work.WorkInfo;
 
 import com.blankj.utilcode.util.KeyboardUtils;
 import com.codyy.devicelibrary.DeviceUtils;
+import com.codyy.live.share.OpenItemEvent;
+import com.codyy.live.share.ResPathEvent;
+import com.codyy.live.share.ResResultEvent;
 import com.codyy.live.webtrc.PeerConnectionParameters;
 import com.codyy.live.webtrc.Role;
 import com.codyy.live.webtrc.RtcListener;
@@ -39,6 +42,7 @@ import com.yanzhenjie.permission.Permission;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONObject;
 import org.webrtc.EglBase;
 import org.webrtc.RendererCommon;
 import org.webrtc.SurfaceViewRenderer;
@@ -745,10 +749,21 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         });
     }
 
+    @Override
+    public void onResResult(JSONObject jsonObject) {
+        EventBus.getDefault().post(new ResResultEvent(jsonObject));
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(ResPathEvent event) {
         if (webRtcClient != null) {
             webRtcClient.getResPath(event.getPath());
+        }
+    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(OpenItemEvent event) {
+        if (webRtcClient != null) {
+            webRtcClient.openResItem(event.getFullPath());
         }
     }
 }

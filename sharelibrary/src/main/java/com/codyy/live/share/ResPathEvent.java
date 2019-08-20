@@ -1,4 +1,4 @@
-package com.dingsoft.webrtc.webrtcroom.activity;
+package com.codyy.live.share;
 
 public class ResPathEvent {
     private String path;

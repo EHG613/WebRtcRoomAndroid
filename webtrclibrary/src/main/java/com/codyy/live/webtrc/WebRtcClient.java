@@ -570,6 +570,21 @@ public class WebRtcClient {
         p2pExt("res", Role.PC, content);
     }
 
+    /**
+     * 打开文件
+     * @param path
+     */
+    public void openResItem(String path) {
+        JSONObject content = new JSONObject();
+        try {
+            content.put("action", "openItem");
+            content.put("path", path);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        p2pExt("res", Role.PC, content);
+    }
+
     /*用户手势事件传递*/
     private void p2pExt(String event, String role, JSONObject content) {
         String to = null;
@@ -760,6 +775,9 @@ public class WebRtcClient {
         public void call(Object... args) {
             JSONObject data = (JSONObject) args[0];
             Log.d(TAG, "res:" + data);
+            if (rtcListener != null) {
+                rtcListener.onResResult(data);
+            }
         }
     };
     public static boolean isMirroring;

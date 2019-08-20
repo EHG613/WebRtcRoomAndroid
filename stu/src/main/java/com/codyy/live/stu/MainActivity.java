@@ -38,6 +38,7 @@ import com.yanzhenjie.permission.Action;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.Permission;
 
+import org.json.JSONObject;
 import org.webrtc.EglBase;
 import org.webrtc.RendererCommon;
 import org.webrtc.SurfaceViewRenderer;
@@ -581,5 +582,10 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             mGroup.setVisibility(View.GONE);
             stateLayout.showContentView();
         });
+    }
+
+    @Override
+    public void onResResult(JSONObject jsonObject) {
+
     }
 }
