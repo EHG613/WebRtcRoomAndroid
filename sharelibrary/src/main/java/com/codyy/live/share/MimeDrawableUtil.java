@@ -6,34 +6,19 @@ public class MimeDrawableUtil {
     public static boolean isSupportedMimeToOpen( String mime) {
         boolean isSupportedMimeToOpen=false;
         switch (mime) {
-            case ResType.sevenZ:
-            case ResType.zip:
-                break;
             case ResType.pptx:
             case ResType.ppt:
             case ResType.docx:
             case ResType.doc:
             case ResType.xls:
             case ResType.xlsx:
-                isSupportedMimeToOpen=true;
-                break;
-            case ResType.pdf:
-                break;
-            case ResType.vsd:
-                break;
-            case ResType.ics:
-            case ResType.csv:
-            case ResType.css:
-            case ResType.txt:
-                break;
-            case ResType.htm:
-            case ResType.html:
-                break;
-            case ResType.exe:
-                break;
-            case ResType.parentDir:
-            case ResType.dir:
-                break;
+            case ResType.bmp:
+            case ResType.gif:
+            case ResType.ico:
+            case ResType.jpg:
+            case ResType.jpeg:
+            case ResType.webp:
+            case ResType.png:
             case ResType.mp4:
             case ResType.avi:
             case ResType.mpeg:
@@ -42,26 +27,27 @@ public class MimeDrawableUtil {
             case ResType.webm:
             case ResType.threeG2:
             case ResType.threeGP:
-                isSupportedMimeToOpen=true;
-                break;
             case ResType.aac:
             case ResType.mp3:
             case ResType.oga:
             case ResType.wav:
             case ResType.weba:
+            case ResType.pdf:
                 isSupportedMimeToOpen=true;
                 break;
+            case ResType.sevenZ:
+            case ResType.zip:
+            case ResType.vsd:
+            case ResType.ics:
+            case ResType.csv:
+            case ResType.css:
+            case ResType.txt:
+            case ResType.htm:
+            case ResType.html:
+            case ResType.exe:
+            case ResType.parentDir:
+            case ResType.dir:
             case ResType.ai:
-                break;
-            case ResType.bmp:
-            case ResType.gif:
-            case ResType.ico:
-            case ResType.jpg:
-            case ResType.jpeg:
-            case ResType.webp:
-            case ResType.png:
-                isSupportedMimeToOpen=true;
-                break;
             default:
                 break;
 

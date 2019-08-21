@@ -43,4 +43,6 @@ dependencies {
     api 'com.github.fingdo:stateLayout:1.0.4'
     api project(':webtrclibrary')
     api 'com.blankj:utilcode:1.25.8'
+    api 'com.jakewharton.rxbinding2:rxbinding:2.2.0'
+    api 'com.jakewharton.rxbinding2:rxbinding-recyclerview-v7:2.2.0'
 }

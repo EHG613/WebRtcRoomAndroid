@@ -22,7 +22,7 @@ import com.codyy.live.share.ResPathEvent;
 import com.codyy.live.share.ResResultEvent;
 import com.codyy.live.share.ResType;
 import com.dingsoft.webrtc.webrtcroom.R;
-import com.yanzhenjie.permission.Action;
+import com.jakewharton.rxbinding2.view.RxView;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.Permission;
 
@@ -34,9 +34,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import io.reactivex.internal.disposables.ListCompositeDisposable;
 
 /**
  * created by lijian on 2019/08/19
@@ -47,6 +49,7 @@ public class ResActivity extends AppCompatActivity {
     private RecyclerView mRv;
     private MyAdapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
+    private ListCompositeDisposable listCompositeDisposable = new ListCompositeDisposable();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -106,6 +109,10 @@ public class ResActivity extends AppCompatActivity {
             return vh;
         }
 
+        private Observable<Object> setListener(View view) {
+            return RxView.clicks(view).throttleFirst(500L, TimeUnit.MILLISECONDS);
+        }
+
         // Replace the contents of a view (invoked by the layout manager)
         @Override
         public void onBindViewHolder(MyViewHolder holder, int position) {
@@ -116,13 +123,29 @@ public class ResActivity extends AppCompatActivity {
             String path = mDataset.optJSONObject(position).optString("path");
             long size = mDataset.optJSONObject(position).optLong("size");
             holder.textView.setText(fileName);
-            if (ResType.parentDir.equals(mime) || ResType.dir.equals(mime)) {
-                holder.textView.setOnClickListener(v -> EventBus.getDefault().post(new ResPathEvent(path)));
-            } else if (MimeDrawableUtil.isSupportedMimeToOpen(mime)) {
-                holder.textView.setOnClickListener(v -> EventBus.getDefault().post(new OpenItemEvent(path)));
+            if (ResType.parentDir.equals(mime) || ResType.dir.equals(mime) || MimeDrawableUtil.isSupportedMimeToOpen(mime)) {
+                listCompositeDisposable.add(setListener(holder.textView)
+                        .subscribe(o -> {
+                            if (ResType.parentDir.equals(mime) || ResType.dir.equals(mime)) {//打开文件夹
+                                if (mRG.getCheckedRadioButtonId() == R.id.rb_my_device) {
+                                    //本地文件夹点击事件处理
+                                    showFileDir(path);
+                                } else {
+                                    EventBus.getDefault().post(new ResPathEvent(path));
+                                }
+
+                            } else if (MimeDrawableUtil.isSupportedMimeToOpen(mime)) {//打开文件
+                                if (mRG.getCheckedRadioButtonId() == R.id.rb_my_device) {
+                                    //本地文件夹点击事件处理
+                                } else {
+                                    holder.textView.setOnClickListener(v -> EventBus.getDefault().post(new OpenItemEvent(path)));
+                                }
+                            }
+                        }));
             } else {
                 holder.textView.setOnClickListener(null);
             }
+
             if (!ResType.parentDir.equals(mime)) {
                 holder.tvSize.setText(byte2FitMemorySize(size));
             } else {
@@ -185,21 +208,21 @@ public class ResActivity extends AppCompatActivity {
                 EventBus.getDefault().post(new ResPathEvent(ResPath.DOCUMENTS));
                 break;
             case R.id.rb_my_device:
-                openStorage();
+                openStorage(getSDPath());
                 break;
         }
     }
 
-    private void openStorage() {
+    private void openStorage(String path) {
         if (AndPermission.hasPermissions(this, Permission.Group.STORAGE)) {
-            showFileDir(getSDPath());
+            showFileDir(path);
         } else {
             AndPermission.with(this)
                     .runtime()
                     .permission(Permission.Group.STORAGE)
                     .onGranted(data -> {
                         //申请权限成功
-                        showFileDir(getSDPath());
+                        showFileDir(path);
                     })
                     .onDenied(data -> {
                         //当用户没有允许该权限时，回调该方法
@@ -217,6 +240,7 @@ public class ResActivity extends AppCompatActivity {
         File file = new File(path);
 
         File[] files = file.listFiles();
+
         JSONArray array = new JSONArray();
         //添加所有文件
         for (File f : files) {
@@ -238,15 +262,17 @@ public class ResActivity extends AppCompatActivity {
                 array.put(object);
             }
         }
-        JSONObject object = new JSONObject();
-        try {
-            object.put("name", "..");
-            object.put("size", 0);
-            object.put("mime", "parentDir");
-            object.put("path", path.substring(0, path.lastIndexOf("/")));
-            array.put(0, object);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (!path.equals(getSDPath())) {//如果path和sd卡根路径一致，则不增加返回上一页选项
+            JSONObject object = new JSONObject();
+            try {
+                object.put("name", "..");
+                object.put("size", 0);
+                object.put("mime", "parentDir");
+                object.put("path", path.substring(0, path.lastIndexOf("/")));
+                array.put(0, object);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         if (mAdapter != null) {

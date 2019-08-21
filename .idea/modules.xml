@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/WebRtcRoomAndroid.iml" filepath="$PROJECT_DIR$/WebRtcRoomAndroid.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/WebRtcRoomAndroid.iml" filepath="$PROJECT_DIR$/.idea/WebRtcRoomAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/sharelibrary/sharelibrary.iml" filepath="$PROJECT_DIR$/sharelibrary/sharelibrary.iml" />
       <module fileurl="file://$PROJECT_DIR$/stu/stu.iml" filepath="$PROJECT_DIR$/stu/stu.iml" />
