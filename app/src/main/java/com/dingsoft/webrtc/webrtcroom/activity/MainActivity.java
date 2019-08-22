@@ -28,7 +28,9 @@ import com.codyy.devicelibrary.DeviceUtils;
 import com.codyy.live.share.OpenItemEvent;
 import com.codyy.live.share.ResPathEvent;
 import com.codyy.live.share.ResResultEvent;
+import com.codyy.live.share.ResSendFileEvent;
 import com.codyy.live.webtrc.PeerConnectionParameters;
+import com.codyy.live.webtrc.RecorderAction;
 import com.codyy.live.webtrc.Role;
 import com.codyy.live.webtrc.RtcListener;
 import com.codyy.live.webtrc.WebRtcClient;
@@ -202,6 +204,8 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             }
         });
         mFullScreen.setOnClickListener(this);
+        findViewById(R.id.btn_start_recorder).setOnClickListener(this);
+        findViewById(R.id.btn_stop_recorder).setOnClickListener(this);
         mPenOrMouse = findViewById(R.id.btn_pen_mouse);
         mPenOrMouse.setOnClickListener(this);
         mEsc = findViewById(R.id.btn_esc);
@@ -434,6 +438,12 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             case R.id.btn_res:
                 startActivity(new Intent(this, ResActivity.class));
                 break;
+            case R.id.btn_start_recorder:
+                if(webRtcClient!=null)webRtcClient.recorder(RecorderAction.START);
+                break;
+            case R.id.btn_stop_recorder:
+                if(webRtcClient!=null)webRtcClient.recorder(RecorderAction.STOP);
+                break;
             default:
                 break;
         }
@@ -446,7 +456,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         Point displaySize = new Point();
         this.getWindowManager().getDefaultDisplay().getSize(displaySize);
         Log.i("displaySize:", displaySize.x + "*" + displaySize.y);
-        displaySize.set(1280, 720);//设置画面的大小
+        displaySize.set(640, 480);//设置画面的大小
         peerConnectionParameters = new PeerConnectionParameters(true, false,
                 false, displaySize.x, displaySize.y, 20,
                 0, "H264 High",
@@ -764,6 +774,12 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     public void onMessageEvent(OpenItemEvent event) {
         if (webRtcClient != null) {
             webRtcClient.openResItem(event.getFullPath());
+        }
+    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(ResSendFileEvent event) {
+        if (webRtcClient != null) {
+            webRtcClient.sendFile(event.getFilePath());
         }
     }
 }

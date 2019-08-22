@@ -112,6 +112,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="资源" />
+        <Button
+            android:id="@+id/btn_start_recorder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="开始录制" />
+        <Button
+            android:id="@+id/btn_stop_recorder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="结束录制" />
     </LinearLayout>
 
     <com.fingdo.statelayout.StateLayout

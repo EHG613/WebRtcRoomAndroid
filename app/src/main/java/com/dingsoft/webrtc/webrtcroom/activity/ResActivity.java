@@ -20,6 +20,7 @@ import com.codyy.live.share.OpenItemEvent;
 import com.codyy.live.share.ResPath;
 import com.codyy.live.share.ResPathEvent;
 import com.codyy.live.share.ResResultEvent;
+import com.codyy.live.share.ResSendFileEvent;
 import com.codyy.live.share.ResType;
 import com.dingsoft.webrtc.webrtcroom.R;
 import com.jakewharton.rxbinding2.view.RxView;
@@ -136,7 +137,8 @@ public class ResActivity extends AppCompatActivity {
 
                             } else if (MimeDrawableUtil.isSupportedMimeToOpen(mime)) {//打开文件
                                 if (mRG.getCheckedRadioButtonId() == R.id.rb_my_device) {
-                                    //本地文件夹点击事件处理
+                                    //发送文件
+                                    EventBus.getDefault().post(new ResSendFileEvent(path));
                                 } else {
                                     holder.textView.setOnClickListener(v -> EventBus.getDefault().post(new OpenItemEvent(path)));
                                 }

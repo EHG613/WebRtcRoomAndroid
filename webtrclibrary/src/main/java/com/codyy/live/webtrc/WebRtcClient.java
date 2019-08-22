@@ -17,6 +17,8 @@ import org.webrtc.DefaultVideoDecoderFactory;
 import org.webrtc.DefaultVideoEncoderFactory;
 import org.webrtc.EglBase;
 import org.webrtc.IceCandidate;
+import org.webrtc.Loggable;
+import org.webrtc.Logging;
 import org.webrtc.MediaConstraints;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
@@ -154,7 +156,7 @@ public class WebRtcClient {
 
     //创建IceServers参数
     private void createIceServers() {
-//        iceServers.add(PeerConnection.IceServer.builder("stun:stun.xten.com").createIceServer());
+        iceServers.add(PeerConnection.IceServer.builder("stun:stun.xten.com").createIceServer());
     }
 
     //创建RTCConfiguration参数
@@ -557,6 +559,7 @@ public class WebRtcClient {
 
     /**
      * 请求资源列表
+     *
      * @param path
      */
     public void getResPath(String path) {
@@ -572,6 +575,7 @@ public class WebRtcClient {
 
     /**
      * 打开文件
+     *
      * @param path
      */
     public void openResItem(String path) {
@@ -583,6 +587,19 @@ public class WebRtcClient {
             e.printStackTrace();
         }
         p2pExt("res", Role.PC, content);
+    }
+    public void recorder(@RecorderAction String action) {
+        JSONObject content = new JSONObject();
+        try {
+            content.put("action", action);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        p2pExt("recorder", Role.PC, content);
+    }
+
+    public void sendFile(String path) {
+        getOrCreateRtcConnect(socketId).sendFile(path);
     }
 
     /*用户手势事件传递*/
@@ -939,6 +956,7 @@ public class WebRtcClient {
         sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
                 "OfferToReceiveVideo", "true"));
         sdpMediaConstraints.optional.add(new MediaConstraints.KeyValuePair("DtlsSrtpKeyAgreement", "true"));
+        sdpMediaConstraints.optional.add(new MediaConstraints.KeyValuePair("RtpDataChannels", "false"));
     }
 
     //创建PeerConnection
