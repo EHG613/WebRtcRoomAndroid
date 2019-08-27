@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     //PeerConnectionParameters
     private PeerConnectionParameters peerConnectionParameters;
     private CheckBox mCbMenuRecorder,mCbRecorderStartOrStop,mCbRecorderPauseOrResume;
+    private CheckBox mCbMenuPhysical,mCbPhysicalStartOrStop,mCbPhysicalSwitch;
 
     //记录用户首次点击返回键的时间
     private long firstTime = 0;
@@ -97,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.activity_main);
         initRecoder();
+        initPhysical();
         mFullScreen = findViewById(R.id.btn_fullscreen);
         mBtnRes = findViewById(R.id.btn_res);
         mBtnRes.setOnClickListener(this);
@@ -276,6 +278,29 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         });
     }
 
+    /**
+     * 初始化实物展台
+     */
+    private void initPhysical() {
+        mCbMenuPhysical=findViewById(R.id.cb_menu_physical);
+        mCbMenuPhysical.setOnCheckedChangeListener((buttonView, isChecked) -> findViewById(R.id.ll_physical).setVisibility(isChecked? View.VISIBLE:View.GONE));
+        mCbPhysicalStartOrStop=findViewById(R.id.cb_physical_start_or_stop);
+        mCbPhysicalSwitch=findViewById(R.id.cb_switch);
+        mCbPhysicalStartOrStop.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (webRtcClient != null) {
+                    if(isChecked){
+                        webRtcClient.startCapture();
+                    }else{
+                        webRtcClient.stopCapture();
+                    }
+                }
+            mCbPhysicalSwitch.setVisibility(isChecked?View.VISIBLE:View.GONE);
+        });
+        mCbPhysicalSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(webRtcClient!=null)webRtcClient.switchCamera();
+        });
+    }
+
     private void getNumLength(EditText... editText) {
         int i = 0;
         for (EditText text : editText) {
@@ -292,6 +317,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             public void CallBack(WorkInfo status) {
                 createWebRtcClient(getString(R.string.host_addr, status.getOutputData().getString("ip"), status.getOutputData().getString("port")));
                 Log.e("info", getString(R.string.host_addr, status.getOutputData().getString("ip"), status.getOutputData().getString("port")));
+//                openCamera();
                 openCamera.performClick();
 //                createRoom.performClick();
 //                stateLayout.showContentView();
