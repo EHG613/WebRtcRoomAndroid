@@ -14,32 +14,6 @@
         sl:layout_constraintBottom_toBottomOf="parent"
         sl:layout_constraintEnd_toEndOf="parent"
         sl:layout_constraintTop_toTopOf="parent">
-        <RelativeLayout
-            android:layout_width="44dp"
-            android:layout_marginTop="8dp"
-            android:layout_gravity="center"
-            android:layout_height="44dp">
-            <CheckBox
-                android:id="@+id/cb_menu_recorder"
-                android:layout_width="36dp"
-                android:button="@null"
-                android:layout_centerInParent="true"
-                android:background="@drawable/drawable_recorder"
-                android:layout_height="25dp"/>
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="44dp"
-            android:layout_gravity="center"
-            android:layout_height="44dp">
-            <CheckBox
-                android:id="@+id/cb_menu_physical"
-                android:layout_width="match_parent"
-                android:padding="2dp"
-                android:button="@null"
-                android:layout_centerInParent="true"
-                android:background="@drawable/drawable_physical"
-                android:layout_height="match_parent"/>
-        </RelativeLayout>
 
         <!-- 本地视频流 -->
         <org.webrtc.SurfaceViewRenderer
@@ -88,15 +62,45 @@
             android:layout_marginRight="4dp"
             android:text="开始发流"
             android:visibility="gone" />
-
-        <Button
-            android:id="@+id/desktop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dp"
-            android:text="共享桌面"
-            android:visibility="visible" />
-
+        <RelativeLayout
+            android:layout_width="44dp"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center"
+            android:layout_height="44dp">
+            <CheckBox
+                android:id="@+id/cb_menu_recorder"
+                android:layout_width="36dp"
+                android:button="@null"
+                android:layout_centerInParent="true"
+                android:background="@drawable/drawable_recorder"
+                android:layout_height="25dp"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="44dp"
+            android:layout_gravity="center"
+            android:layout_height="44dp">
+            <CheckBox
+                android:id="@+id/cb_menu_physical"
+                android:layout_width="match_parent"
+                android:padding="2dp"
+                android:button="@null"
+                android:layout_centerInParent="true"
+                android:background="@drawable/drawable_physical"
+                android:layout_height="match_parent"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="44dp"
+            android:layout_gravity="center"
+            android:layout_height="44dp">
+            <CheckBox
+                android:id="@+id/desktop"
+                android:layout_width="match_parent"
+                android:padding="4dp"
+                android:button="@null"
+                android:layout_centerInParent="true"
+                android:background="@drawable/drawable_desktop_share"
+                android:layout_height="match_parent"/>
+        </RelativeLayout>
         <Button
             android:id="@+id/mirror"
             android:layout_width="wrap_content"

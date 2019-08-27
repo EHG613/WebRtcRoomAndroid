@@ -22,7 +22,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextClock;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import androidx.work.WorkInfo;
 
@@ -57,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     private Button createRoom;
     private Button exitRoom;
     private Button shareDesktop;
-    private VideoView mVideoView;
     private TextClock mTextClock;
     private StateLayout stateLayout;
     private SurfaceViewRenderer localSurfaceViewRenderer;
@@ -208,7 +206,6 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         createRoom.setOnClickListener(this);
         exitRoom = findViewById(R.id.exit);
         exitRoom.setOnClickListener(this);
-        mVideoView = findViewById(R.id.video);
         shareDesktop = findViewById(R.id.desktop);
         shareDesktop.setOnClickListener(this);
         findViewById(R.id.stopCapture).setOnClickListener(this);
@@ -499,8 +496,6 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 if (WebRtcClient.isMirroring) {
                     return;
                 }
-                mVideoView.stopPlayback();
-                mVideoView.setVisibility(View.GONE);
                 ////UI线程执行
                 //构建远端view
                 SurfaceViewRenderer remoteView = new SurfaceViewRenderer(MainActivity.this);
@@ -534,8 +529,6 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mVideoView.setVisibility(View.GONE);
-                mVideoView.stopPlayback();
                 ////UI线程执行
                 //移除远端view
                 SurfaceViewRenderer remoteView = (SurfaceViewRenderer) remoteViews.get(peerId);

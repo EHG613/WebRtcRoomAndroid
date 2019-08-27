@@ -108,17 +108,6 @@
 
         </LinearLayout>
     </com.fingdo.statelayout.StateLayout>
-
-    <VideoView
-        android:id="@+id/video"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        sl:layout_constraintBottom_toBottomOf="parent"
-        sl:layout_constraintEnd_toStartOf="@id/ll_end"
-        sl:layout_constraintStart_toStartOf="parent"
-        sl:layout_constraintTop_toTopOf="parent" />
-
     <TextClock
         android:id="@+id/clock"
         android:layout_width="0dp"
@@ -266,6 +255,7 @@
         android:id="@+id/group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        tools:visibility="gone"
         sl:constraint_referenced_ids="v_num,et1,et2,et3,et4,et5,et6,create,tv_title" />
 
     <android.support.constraint.Guideline

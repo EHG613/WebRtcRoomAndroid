@@ -20,6 +20,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     //控件
     private EditText roomName, et1, et2, et3, et4, et5, et6;
     private Group mGroup;
-    private Button openCamera, switchCamera, createRoom, exitRoom, shareDesktop, mMirror;
+    private Button openCamera, switchCamera, createRoom, exitRoom, mMirror;
     private Button mFullScreen, mEsc, mClose, mPenOrMouse, mBtnRes;
     private StateLayout stateLayout;
     private SurfaceViewRenderer localSurfaceViewRenderer;
@@ -75,9 +76,9 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     private WebRtcClient webRtcClient;
     //PeerConnectionParameters
     private PeerConnectionParameters peerConnectionParameters;
-    private CheckBox mCbMenuRecorder,mCbRecorderStartOrStop,mCbRecorderPauseOrResume;
-    private CheckBox mCbMenuPhysical,mCbPhysicalStartOrStop,mCbPhysicalSwitch;
-
+    private CheckBox mCbMenuRecorder, mCbRecorderStartOrStop, mCbRecorderPauseOrResume;
+    private CheckBox mCbMenuPhysical, mCbPhysicalStartOrStop, mCbPhysicalSwitch;
+    private CheckBox shareDesktop;
     //记录用户首次点击返回键的时间
     private long firstTime = 0;
     //摄像头是否开启
@@ -228,8 +229,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         createRoom.setEnabled(false);
         exitRoom = findViewById(R.id.exit);
         exitRoom.setOnClickListener(this);
-        shareDesktop = findViewById(R.id.desktop);
-        shareDesktop.setOnClickListener(this);
+        initShareDesktop();
         mMirror = findViewById(R.id.mirror);
         mMirror.setOnClickListener(this);
         findViewById(R.id.stopCapture).setOnClickListener(this);
@@ -256,25 +256,43 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     }
 
     /**
+     * 初始化共享桌面
+     */
+    private void initShareDesktop() {
+        shareDesktop = findViewById(R.id.desktop);
+        shareDesktop.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (webRtcClient != null) {
+                if (isChecked) {
+                    webRtcClient.shareDesktop();
+                } else {
+                    webRtcClient.closeDesktop();
+                }
+            }
+        });
+    }
+
+    /**
      * 初始化视频录制
      */
     private void initRecoder() {
-        mCbMenuRecorder=findViewById(R.id.cb_menu_recorder);
-        mCbMenuRecorder.setOnCheckedChangeListener((buttonView, isChecked) -> findViewById(R.id.ll_recorder).setVisibility(isChecked? View.VISIBLE:View.GONE));
-        mCbRecorderStartOrStop=findViewById(R.id.cb_recorder_start_or_stop);
-        mCbRecorderPauseOrResume=findViewById(R.id.cb_recorder_pause_or_resume);
+        mCbMenuRecorder = findViewById(R.id.cb_menu_recorder);
+        mCbMenuRecorder.setOnCheckedChangeListener((buttonView, isChecked) -> findViewById(R.id.ll_recorder).setVisibility(isChecked ? View.VISIBLE : View.GONE));
+        mCbRecorderStartOrStop = findViewById(R.id.cb_recorder_start_or_stop);
+        mCbRecorderPauseOrResume = findViewById(R.id.cb_recorder_pause_or_resume);
         mCbRecorderStartOrStop.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            ToastUtils.setGravity(Gravity.CENTER,0,0);
+            ToastUtils.setGravity(Gravity.CENTER, 0, 0);
             ToastUtils.setBgColor(Color.parseColor("#273144"));
-            ToastUtils.showShort(isChecked?"开始录制":"停止录制");
-            mCbRecorderPauseOrResume.setVisibility(isChecked?View.VISIBLE:View.GONE);
-            if(webRtcClient!=null)webRtcClient.recorder(isChecked? RecorderAction.START:RecorderAction.STOP);
+            ToastUtils.showShort(isChecked ? "开始录制" : "停止录制");
+            mCbRecorderPauseOrResume.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            if (webRtcClient != null)
+                webRtcClient.recorder(isChecked ? RecorderAction.START : RecorderAction.STOP);
         });
         mCbRecorderPauseOrResume.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            ToastUtils.setGravity(Gravity.CENTER,0,0);
+            ToastUtils.setGravity(Gravity.CENTER, 0, 0);
             ToastUtils.setBgColor(Color.parseColor("#273144"));
-            ToastUtils.showShort(isChecked?"暂停录制":"恢复录制");
-            if(webRtcClient!=null)webRtcClient.recorder(isChecked?RecorderAction.PAUSE:RecorderAction.RESUME);
+            ToastUtils.showShort(isChecked ? "暂停录制" : "恢复录制");
+            if (webRtcClient != null)
+                webRtcClient.recorder(isChecked ? RecorderAction.PAUSE : RecorderAction.RESUME);
         });
     }
 
@@ -282,22 +300,22 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
      * 初始化实物展台
      */
     private void initPhysical() {
-        mCbMenuPhysical=findViewById(R.id.cb_menu_physical);
-        mCbMenuPhysical.setOnCheckedChangeListener((buttonView, isChecked) -> findViewById(R.id.ll_physical).setVisibility(isChecked? View.VISIBLE:View.GONE));
-        mCbPhysicalStartOrStop=findViewById(R.id.cb_physical_start_or_stop);
-        mCbPhysicalSwitch=findViewById(R.id.cb_switch);
+        mCbMenuPhysical = findViewById(R.id.cb_menu_physical);
+        mCbMenuPhysical.setOnCheckedChangeListener((buttonView, isChecked) -> findViewById(R.id.ll_physical).setVisibility(isChecked ? View.VISIBLE : View.GONE));
+        mCbPhysicalStartOrStop = findViewById(R.id.cb_physical_start_or_stop);
+        mCbPhysicalSwitch = findViewById(R.id.cb_switch);
         mCbPhysicalStartOrStop.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (webRtcClient != null) {
-                    if(isChecked){
-                        webRtcClient.startCapture();
-                    }else{
-                        webRtcClient.stopCapture();
-                    }
+            if (webRtcClient != null) {
+                if (isChecked) {
+                    webRtcClient.startCapture();
+                } else {
+                    webRtcClient.stopCapture();
                 }
-            mCbPhysicalSwitch.setVisibility(isChecked?View.VISIBLE:View.GONE);
+            }
+            mCbPhysicalSwitch.setVisibility(isChecked ? View.VISIBLE : View.GONE);
         });
         mCbPhysicalSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if(webRtcClient!=null)webRtcClient.switchCamera();
+            if (webRtcClient != null) webRtcClient.switchCamera();
         });
     }
 
@@ -435,17 +453,6 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             case R.id.startCapture:
                 if (webRtcClient != null) {
                     webRtcClient.startCapture();
-                }
-                break;
-            case R.id.desktop:
-                if (webRtcClient != null) {
-                    if ("共享桌面".equals(shareDesktop.getText().toString())) {
-                        shareDesktop.setText("结束共享");
-                        webRtcClient.shareDesktop();
-                    } else {
-                        shareDesktop.setText("共享桌面");
-                        webRtcClient.closeDesktop();
-                    }
                 }
                 break;
             case R.id.mirror:
