@@ -1,6 +1,7 @@
 package com.dingsoft.webrtc.webrtcroom.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.hardware.Camera;
@@ -11,12 +12,14 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -24,6 +27,7 @@ import android.widget.Toast;
 import androidx.work.WorkInfo;
 
 import com.blankj.utilcode.util.KeyboardUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.codyy.devicelibrary.DeviceUtils;
 import com.codyy.live.share.OpenItemEvent;
 import com.codyy.live.share.ResPathEvent;
@@ -71,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     private WebRtcClient webRtcClient;
     //PeerConnectionParameters
     private PeerConnectionParameters peerConnectionParameters;
-
+    private CheckBox mCbMenuRecorder,mCbRecorderStartOrStop,mCbRecorderPauseOrResume;
 
     //记录用户首次点击返回键的时间
     private long firstTime = 0;
@@ -92,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                         | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.activity_main);
+        initRecoder();
         mFullScreen = findViewById(R.id.btn_fullscreen);
         mBtnRes = findViewById(R.id.btn_res);
         mBtnRes.setOnClickListener(this);
@@ -204,8 +209,6 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             }
         });
         mFullScreen.setOnClickListener(this);
-        findViewById(R.id.btn_start_recorder).setOnClickListener(this);
-        findViewById(R.id.btn_stop_recorder).setOnClickListener(this);
         mPenOrMouse = findViewById(R.id.btn_pen_mouse);
         mPenOrMouse.setOnClickListener(this);
         mEsc = findViewById(R.id.btn_esc);
@@ -248,6 +251,29 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             }
         });
         initCall();
+    }
+
+    /**
+     * 初始化视频录制
+     */
+    private void initRecoder() {
+        mCbMenuRecorder=findViewById(R.id.cb_menu_recorder);
+        mCbMenuRecorder.setOnCheckedChangeListener((buttonView, isChecked) -> findViewById(R.id.ll_recorder).setVisibility(isChecked? View.VISIBLE:View.GONE));
+        mCbRecorderStartOrStop=findViewById(R.id.cb_recorder_start_or_stop);
+        mCbRecorderPauseOrResume=findViewById(R.id.cb_recorder_pause_or_resume);
+        mCbRecorderStartOrStop.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            ToastUtils.setGravity(Gravity.CENTER,0,0);
+            ToastUtils.setBgColor(Color.parseColor("#273144"));
+            ToastUtils.showShort(isChecked?"开始录制":"停止录制");
+            mCbRecorderPauseOrResume.setVisibility(isChecked?View.VISIBLE:View.GONE);
+            if(webRtcClient!=null)webRtcClient.recorder(isChecked? RecorderAction.START:RecorderAction.STOP);
+        });
+        mCbRecorderPauseOrResume.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            ToastUtils.setGravity(Gravity.CENTER,0,0);
+            ToastUtils.setBgColor(Color.parseColor("#273144"));
+            ToastUtils.showShort(isChecked?"暂停录制":"恢复录制");
+            if(webRtcClient!=null)webRtcClient.recorder(isChecked?RecorderAction.PAUSE:RecorderAction.RESUME);
+        });
     }
 
     private void getNumLength(EditText... editText) {
@@ -438,12 +464,6 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             case R.id.btn_res:
                 startActivity(new Intent(this, ResActivity.class));
                 break;
-            case R.id.btn_start_recorder:
-                if(webRtcClient!=null)webRtcClient.recorder(RecorderAction.START);
-                break;
-            case R.id.btn_stop_recorder:
-                if(webRtcClient!=null)webRtcClient.recorder(RecorderAction.STOP);
-                break;
             default:
                 break;
         }
@@ -628,7 +648,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 remoteView.setEnableHardwareScaler(false);
                 remoteView.setMirror(false);
                 //控件布局
-                int width = (Integer.parseInt(DeviceUtils.getScreenWidth(MainActivity.this)) - getResources().getDimensionPixelSize(R.dimen.right_margin));
+                int width = (Integer.parseInt(DeviceUtils.getScreenWidth(MainActivity.this)) - getResources().getDimensionPixelSize(R.dimen.right_margin) / 2);
                 int height = width * 9 / 16;
                 remoteView.setLongClickable(true);
                 mGestureDetector = new GestureDetector(remoteVideoLl.getContext(), new GestureDetector.SimpleOnGestureListener() {
@@ -770,12 +790,14 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             webRtcClient.getResPath(event.getPath());
         }
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(OpenItemEvent event) {
         if (webRtcClient != null) {
             webRtcClient.openResItem(event.getFullPath());
         }
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(ResSendFileEvent event) {
         if (webRtcClient != null) {
