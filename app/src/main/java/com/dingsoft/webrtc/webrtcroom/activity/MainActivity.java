@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.constraint.Group;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,7 +21,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -444,21 +444,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
 
                 break;
             case R.id.exit:
-                //退出聊天室
-                if (webRtcClient != null) {
-                    webRtcClient.exitRoom();
-                    //通知UI清空远端摄像头
-                    clearRemoteCamera();
-                    webRtcClient.closeCamera();
-                    //数据
-                    localSurfaceViewRenderer.clearImage();
-                    localSurfaceViewRenderer.setBackground(new ColorDrawable(getResources().getColor(R.color.colorBlack)));
-                    //localSurfaceViewRenderer.setForeground(new ColorDrawable(R.color.colorBlack));
-                    localSurfaceViewRenderer.release();
-                    isCameraOpen = false;
-                    openCamera.setText("开启摄像头");
-                }
-                createRoom.setEnabled(true);
+                onExitRoom();
                 break;
             case R.id.stopCapture:
                 if (webRtcClient != null) {
@@ -504,6 +490,35 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             default:
                 break;
         }
+    }
+    private void onExitRoom(){
+        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        builder.setTitle("提示")
+                .setMessage("是否确认退出？")
+                .setPositiveButton("确定", (dialog, which) -> {
+                    //退出聊天室
+                    if (webRtcClient != null) {
+                        webRtcClient.exitRoom();
+                        //通知UI清空远端摄像头
+                        clearRemoteCamera();
+                        webRtcClient.closeCamera();
+                        //数据
+                        localSurfaceViewRenderer.clearImage();
+                        localSurfaceViewRenderer.setBackground(new ColorDrawable(getResources().getColor(R.color.colorBlack)));
+                        //localSurfaceViewRenderer.setForeground(new ColorDrawable(R.color.colorBlack));
+                        localSurfaceViewRenderer.release();
+                        isCameraOpen = false;
+                        openCamera.setText("开启摄像头");
+                    }
+                    createRoom.setEnabled(true);
+                    finish();
+                })
+                .setNegativeButton("取消", (dialog, which) -> {
+
+                })
+                .setCancelable(true)
+                .create()
+                .show();
     }
 
     //创建配置参数
