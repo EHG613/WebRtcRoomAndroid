@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     //控件
     private EditText roomName, et1, et2, et3, et4, et5, et6;
     private Group mGroup;
-    private Button openCamera, switchCamera, createRoom, exitRoom, mMirror;
+    private Button openCamera, switchCamera, createRoom, exitRoom;
     private Button mFullScreen, mEsc, mClose, mPenOrMouse, mBtnRes;
     private StateLayout stateLayout;
     private SurfaceViewRenderer localSurfaceViewRenderer;
@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     private CheckBox mCbMenuRecorder, mCbRecorderStartOrStop, mCbRecorderPauseOrResume;
     private CheckBox mCbMenuPhysical, mCbPhysicalStartOrStop, mCbPhysicalSwitch;
     private CheckBox shareDesktop;
+    private CheckBox mMirror;
     //记录用户首次点击返回键的时间
     private long firstTime = 0;
     //摄像头是否开启
@@ -230,8 +231,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         exitRoom = findViewById(R.id.exit);
         exitRoom.setOnClickListener(this);
         initShareDesktop();
-        mMirror = findViewById(R.id.mirror);
-        mMirror.setOnClickListener(this);
+        initMirror();
         findViewById(R.id.stopCapture).setOnClickListener(this);
         findViewById(R.id.startCapture).setOnClickListener(this);
         localSurfaceViewRenderer = findViewById(R.id.localVideo);
@@ -267,6 +267,21 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 } else {
                     webRtcClient.closeDesktop();
                 }
+            }
+        });
+    }
+    /**
+     * 初始化同屏镜像
+     */
+    private void initMirror() {
+        mMirror = findViewById(R.id.mirror);
+        mMirror.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (webRtcClient != null) {
+                    if (isChecked) {
+                        webRtcClient.mirror();
+                    } else {
+                        webRtcClient.unMirror();
+                    }
             }
         });
     }
@@ -453,17 +468,6 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             case R.id.startCapture:
                 if (webRtcClient != null) {
                     webRtcClient.startCapture();
-                }
-                break;
-            case R.id.mirror:
-                if (webRtcClient != null) {
-                    if ("镜像".equals(mMirror.getText().toString())) {
-                        mMirror.setText("取消镜像");
-                        webRtcClient.mirror();
-                    } else {
-                        mMirror.setText("镜像");
-                        webRtcClient.unMirror();
-                    }
                 }
                 break;
             case R.id.btn_fullscreen:
