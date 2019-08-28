@@ -60,6 +60,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import io.github.tonnyl.spark.Spark;
+
 public class MainActivity extends AppCompatActivity implements RtcListener, View.OnClickListener {
     //控件
     private EditText roomName, et1, et2, et3, et4, et5, et6;
@@ -85,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     //摄像头是否开启
     private boolean isCameraOpen = false;
     private PortWorkLifecycle portWorkLifecycle;
+    private Spark mSpark;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +102,12 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                         | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.activity_main);
+        mSpark = new Spark.Builder().
+                setView(findViewById(R.id.v_num_1))
+                .setAnimList(Spark.ANIM_RED_PURPLE)
+                .setDuration(5000)
+                .build();
+        mSpark.startAnimation();
         initRecoder();
         initPhysical();
         mFullScreen = findViewById(R.id.btn_fullscreen);
@@ -270,6 +279,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             }
         });
     }
+
     /**
      * 初始化同屏镜像
      */
@@ -277,11 +287,11 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         mMirror = findViewById(R.id.mirror);
         mMirror.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (webRtcClient != null) {
-                    if (isChecked) {
-                        webRtcClient.mirror();
-                    } else {
-                        webRtcClient.unMirror();
-                    }
+                if (isChecked) {
+                    webRtcClient.mirror();
+                } else {
+                    webRtcClient.unMirror();
+                }
             }
         });
     }
@@ -491,8 +501,9 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 break;
         }
     }
-    private void onExitRoom(){
-        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+
+    private void onExitRoom() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("提示")
                 .setMessage("是否确认退出？")
                 .setPositiveButton("确定", (dialog, which) -> {
@@ -827,6 +838,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         runOnUiThread(() -> {
             createRoom.setEnabled(false);
             mGroup.setVisibility(View.GONE);
+            if (mSpark != null) mSpark.stopAnimation();
             stateLayout.showContentView();
         });
     }

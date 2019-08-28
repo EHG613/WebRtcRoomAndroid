@@ -208,6 +208,15 @@
         sl:layout_constraintEnd_toEndOf="parent"
         sl:layout_constraintStart_toStartOf="parent"
         sl:layout_constraintTop_toTopOf="parent" />
+    <View
+        android:id="@+id/v_num_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/white"
+        sl:layout_constraintBottom_toBottomOf="parent"
+        sl:layout_constraintEnd_toEndOf="parent"
+        sl:layout_constraintStart_toStartOf="parent"
+        sl:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/et1"
@@ -333,7 +342,7 @@
         android:layout_width="wrap_content"
         tools:visibility="gone"
         android:layout_height="wrap_content"
-        sl:constraint_referenced_ids="v_num,et1,et2,et3,et4,et5,et6,create,tv_title" />
+        sl:constraint_referenced_ids="v_num,v_num_1,et1,et2,et3,et4,et5,et6,create,tv_title" />
     <android.support.constraint.Guideline
         android:id="@+id/guideline"
         android:orientation="horizontal"
