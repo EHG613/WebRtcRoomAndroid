@@ -102,12 +102,14 @@
                 android:layout_height="match_parent"/>
         </RelativeLayout>
         <RelativeLayout
+            android:id="@+id/rl_mirror"
             android:layout_width="44dp"
             android:layout_gravity="center"
             android:layout_height="44dp">
             <CheckBox
                 android:id="@+id/mirror"
                 android:layout_width="36dp"
+                android:clickable="false"
                 android:padding="4dp"
                 android:button="@null"
                 android:layout_centerInParent="true"

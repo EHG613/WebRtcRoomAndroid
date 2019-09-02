@@ -1,10 +1,13 @@
 package com.udp;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UdpTest {
     @Test
@@ -36,5 +39,17 @@ public class UdpTest {
         System.out.println("我是客户端，服务器说：" + reply+" 我的IP是:"+packet2.getAddress().getHostAddress());
         // 4.关闭资源
         socket.close();
+    }
+    @Test
+    public void testList(){
+        List<String> list=new ArrayList<>();
+        list.add("1");
+        list.add("2");
+        list.add("3");
+        Assert.assertEquals(3,list.size());
+        list.remove("1");
+        Assert.assertEquals(2,list.size());
+        list.remove("3");
+        Assert.assertEquals(1,list.size());
     }
 }

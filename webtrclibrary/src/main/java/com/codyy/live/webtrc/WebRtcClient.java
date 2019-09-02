@@ -41,8 +41,10 @@ import org.webrtc.voiceengine.WebRtcAudioUtils;
 
 import java.net.URISyntaxException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -329,8 +331,33 @@ public class WebRtcClient {
         return pc;
     }
 
-    public void mirror() {
-        createMirrorMessage("mirror");
+    public void mirror(List<String> ids) {
+        if(ids==null||ids.size()==0)return;
+//        createMirrorMessage("mirror");
+        String to = null;
+        JSONArray p2Mirrors = new JSONArray();
+        for (Peer peer : peers.values()) {
+            if (Role.PC.equals(peer.getRole())) {
+                to = peer.getId();
+                break;
+            }
+        }
+        for (String id : ids) {
+                p2Mirrors.put(id);
+        }
+        if (TextUtils.isEmpty(to) || p2Mirrors.length() == 0) return;
+        //构建信令数据并发送
+        try {
+            JSONObject message = new JSONObject();
+            message.put("room", roomId);
+            message.put("from", socketId);
+            message.put("to", to);
+            message.put("peers", p2Mirrors);
+            //向信令服务器发送信令
+            sendMessage("mirror", message);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public void unMirror() {
@@ -364,6 +391,15 @@ public class WebRtcClient {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+    public List<String> getMirrors(){
+        List<String> mirrors=new ArrayList<>();
+        for (Peer peer : peers.values()) {
+            if (Role.CLIENT.equals(peer.getRole()) || peer.getRole() == null) {
+                mirrors.add(peer.getId());
+            }
+        }
+        return mirrors;
     }
 
     /**

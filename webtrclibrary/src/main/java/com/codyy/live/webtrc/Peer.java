@@ -82,7 +82,7 @@ public class Peer implements SdpObserver, PeerConnection.Observer {
                                 false);
                         Log.e("channel", dataChannel.send(buffer2)+"");
                         Log.e("channel", dataChannel.state().name());
-                        sendFile("/storage/emulated/0/01bf1655e514b16ac7251df840273f.jpg");
+//                        sendFile("/storage/emulated/0/01bf1655e514b16ac7251df840273f.jpg");
                         break;
                     case CLOSED:
                         Log.e("channel", "CLOSED");
@@ -121,10 +121,11 @@ public class Peer implements SdpObserver, PeerConnection.Observer {
 
     private DataChannel.Buffer convertFileToByteArray(String path) {
         DataChannel.Buffer buffer = null;
-        File file = new File(path);
+        File file;
         FileInputStream fis = null;
         ByteArrayOutputStream bos = null;
         try {
+            file = new File(path);
             fis = new FileInputStream(file);
             bos = new ByteArrayOutputStream();
             byte[] b = new byte[1024];

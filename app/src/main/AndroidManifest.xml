@@ -36,6 +36,9 @@
         <activity android:name=".activity.ResActivity"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:screenOrientation="landscape"/>
+        <activity android:name=".activity.MirrorClientsActivity"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            android:screenOrientation="landscape"/>
     </application>
 
 </manifest>

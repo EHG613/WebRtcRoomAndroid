@@ -1,5 +1,6 @@
 package com.dingsoft.webrtc.webrtcroom.activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -23,6 +24,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.work.WorkInfo;
@@ -30,6 +32,7 @@ import androidx.work.WorkInfo;
 import com.blankj.utilcode.util.KeyboardUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.codyy.devicelibrary.DeviceUtils;
+import com.codyy.live.share.MirrorClientsEvent;
 import com.codyy.live.share.OpenItemEvent;
 import com.codyy.live.share.ResPathEvent;
 import com.codyy.live.share.ResResultEvent;
@@ -55,6 +58,7 @@ import org.webrtc.RendererCommon;
 import org.webrtc.SurfaceViewRenderer;
 import org.webrtc.VideoTrack;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -283,17 +287,30 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     /**
      * 初始化同屏镜像
      */
+    private RelativeLayout mRlMirror;
+
     private void initMirror() {
         mMirror = findViewById(R.id.mirror);
-        mMirror.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (webRtcClient != null) {
-                if (isChecked) {
-                    webRtcClient.mirror();
-                } else {
-                    webRtcClient.unMirror();
-                }
+        mRlMirror = findViewById(R.id.rl_mirror);
+        mRlMirror.setOnClickListener(v -> {
+            if (mMirror.isChecked()) {
+                mMirror.setChecked(false);
+                webRtcClient.unMirror();
+            } else {
+                multiChoiceMirrors();
             }
         });
+    }
+
+    private void multiChoiceMirrors() {
+        List<String> items = webRtcClient.getMirrors();
+        if (items == null || items.size() == 0) {
+            ToastUtils.showShort("未查询到在线客户端");
+            return;
+        }
+        Intent intent = new Intent(this, MirrorClientsActivity.class);
+        intent.putStringArrayListExtra("list", (ArrayList<String>) items);
+        startActivity(intent);
     }
 
     /**
@@ -866,6 +883,13 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     public void onMessageEvent(ResSendFileEvent event) {
         if (webRtcClient != null) {
             webRtcClient.sendFile(event.getFilePath());
+        }
+    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MirrorClientsEvent event) {
+        if (webRtcClient != null&&event.getMirrors().size()>0) {
+            webRtcClient.mirror(event.getMirrors());
+            mMirror.setChecked(true);
         }
     }
 }
