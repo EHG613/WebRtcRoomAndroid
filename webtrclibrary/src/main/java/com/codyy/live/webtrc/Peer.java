@@ -14,13 +14,11 @@ import org.webrtc.RtpReceiver;
 import org.webrtc.RtpTransceiver;
 import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;
-import org.webrtc.VideoSink;
 import org.webrtc.VideoTrack;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -52,12 +50,18 @@ public class Peer implements SdpObserver, PeerConnection.Observer {
         this.pc = factory.createPeerConnection(rtcConfig, this);
         this.id = id;
         this.webRtcClient = webRtcClient;
-         /*
-    DataChannel.Init 可配参数说明：
-    ordered：是否保证顺序传输；
-    maxRetransmitTimeMs：重传允许的最长时间；
-    maxRetransmits：重传允许的最大次数；
-     */
+//        if(this.webRtcClient.getSocketId().equals(this.id)) {
+//            initDataChannel();
+//        }
+    }
+
+    void initDataChannel() {
+    /*
+DataChannel.Init 可配参数说明：
+ordered：是否保证顺序传输；
+maxRetransmitTimeMs：重传允许的最长时间；
+maxRetransmits：重传允许的最大次数；
+*/
         DataChannel.Init init = new DataChannel.Init();
         dataChannel = getPc().createDataChannel("dataChannel", init);
         dataChannel.registerObserver(new DataChannel.Observer() {
@@ -70,18 +74,19 @@ public class Peer implements SdpObserver, PeerConnection.Observer {
             public void onStateChange() {
                 switch (dataChannel.state()) {
                     case OPEN:
-                        byte[] msg = "HelloWorld".getBytes();
-                        DataChannel.Buffer buffer = new DataChannel.Buffer(
-                                ByteBuffer.wrap(msg),
-                                false);
-                        Log.e("channel", dataChannel.send(buffer)+"");
-                        Log.e("channel", dataChannel.state().name());
-                        byte[] msg2 = "HelloWorldddddd".getBytes();
-                        DataChannel.Buffer buffer2 = new DataChannel.Buffer(
-                                ByteBuffer.wrap(msg2),
-                                false);
-                        Log.e("channel", dataChannel.send(buffer2)+"");
-                        Log.e("channel", dataChannel.state().name());
+                        Log.e("channel", "OPEN");
+//                        byte[] msg = "HelloWorld".getBytes();
+//                        DataChannel.Buffer buffer = new DataChannel.Buffer(
+//                                ByteBuffer.wrap(msg),
+//                                false);
+//                        Log.e("channel", dataChannel.send(buffer) + "");
+//                        Log.e("channel", dataChannel.state().name());
+//                        byte[] msg2 = "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".getBytes();
+//                        DataChannel.Buffer buffer2 = new DataChannel.Buffer(
+//                                ByteBuffer.wrap(msg2),
+//                                false);
+//                        Log.e("channel", dataChannel.send(buffer2) + "");
+//                        Log.e("channel", dataChannel.state().name());
 //                        sendFile("/storage/emulated/0/01bf1655e514b16ac7251df840273f.jpg");
                         break;
                     case CLOSED:
@@ -107,15 +112,23 @@ public class Peer implements SdpObserver, PeerConnection.Observer {
     }
 
     public void sendFile(String path) {
-        Log.e("path",path);
+        Log.e("path", path);
         if (dataChannel != null) {
             Log.e("channel", dataChannel.state().name());
-            byte[] msg = "HelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorld".getBytes();
-            DataChannel.Buffer buffer = new DataChannel.Buffer(
-                    ByteBuffer.wrap(msg),
-                    false);
-            Log.e("sendFile", dataChannel.send(buffer) + "");
-            Log.e("sendFile", dataChannel.send(convertFileToByteArray(path)) + "");
+//            byte[] msg = "HelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorld".getBytes();
+            try {
+                String base64=File2Base64.encodeBase64File(path);
+//                Log.e("Base64",base64);
+                DataChannel.Buffer buffer = new DataChannel.Buffer(
+                        ByteBuffer.wrap(base64.getBytes()),
+                        false);
+//                Log.e("sendFile",  dataChannel.send(new DataChannel.Buffer(
+//                        ByteBuffer.wrap("sendFile".getBytes()),
+//                        false)) + "");
+                Log.e("sendFile", dataChannel.send(buffer) + "");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

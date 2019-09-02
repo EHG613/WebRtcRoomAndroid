@@ -635,7 +635,12 @@ public class WebRtcClient {
     }
 
     public void sendFile(String path) {
-        getOrCreateRtcConnect(socketId).sendFile(path);
+        for (Peer pc : peers.values()) {
+            if(Role.PC.equals(pc.getRole())){
+                getOrCreateRtcConnect(pc.getId()).sendFile(path);
+            }
+        }
+
     }
 
     /*用户手势事件传递*/
@@ -786,6 +791,7 @@ public class WebRtcClient {
                     if (!Role.CLIENT.equals(role)) //如果是学生端，则不主动建立rtc连接
                     {
                         if (Role.PC.equals(pc.getRole())) {
+                            pc.initDataChannel();
                             pc.getPc().createOffer(pc, sdpMediaConstraints);
                         }
                     }
