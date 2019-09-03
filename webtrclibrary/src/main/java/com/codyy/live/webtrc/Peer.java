@@ -114,18 +114,23 @@ maxRetransmits：重传允许的最大次数；
     public void sendFile(String path) {
         Log.e("path", path);
         if (dataChannel != null) {
+            new Thread(new SendFileThread(path)).start();
+//            new SendFileThread(path).run();
+        }
+    }
+
+    class SendFileThread implements Runnable {
+        String path;
+
+        public SendFileThread(String path) {
+            this.path = path;
+        }
+
+        @Override
+        public void run() {
             Log.e("channel", dataChannel.state().name());
-//            byte[] msg = "HelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorldHelloWorld".getBytes();
             try {
-                String base64=File2Base64.encodeBase64File(path);
-//                Log.e("Base64",base64);
-                DataChannel.Buffer buffer = new DataChannel.Buffer(
-                        ByteBuffer.wrap(base64.getBytes()),
-                        false);
-//                Log.e("sendFile",  dataChannel.send(new DataChannel.Buffer(
-//                        ByteBuffer.wrap("sendFile".getBytes()),
-//                        false)) + "");
-                Log.e("sendFile", dataChannel.send(buffer) + "");
+                File2Base64.encodeBase64File(dataChannel, path);
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -1,13 +1,14 @@
 package com.codyy.live.webtrc;
 
 import android.util.Base64;
-
+import android.util.Log;
 
 import org.json.JSONObject;
+import org.webrtc.DataChannel;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 
 public class File2Base64 {
@@ -18,16 +19,31 @@ public class File2Base64 {
      * @return
      * @throws Exception
      */
-    public static String encodeBase64File(String path) throws Exception {
-        File file = new File(path);
-        FileInputStream inputFile = new FileInputStream(file);
-        byte[] buffer = new byte[(int) file.length()];
-        inputFile.read(buffer);
-        inputFile.close();
-        JSONObject object=new JSONObject();
-        object.put("name",file.getName());
-        object.put("file",base64Encode2String(buffer));
-        return object.toString();
+    public static void encodeBase64File(DataChannel channel, String path) throws Exception {
+        RandomAccessFile randomAccessFile=new RandomAccessFile(path,"r");
+        byte[] buffer = new byte[4096*10];
+        try {
+                //分割文件
+                int position = 1;
+                long len=0;
+                long total=0;
+                while ((len=randomAccessFile.read(buffer)) != -1) {
+                    JSONObject object = new JSONObject();
+                    object.put("name", path.substring(path.lastIndexOf("/")));
+                    object.put("position", position);
+                    total+=len;
+                    object.put("percent",total*1f/randomAccessFile.length()*100);
+                    object.put("file", base64Encode2String(buffer));
+                    channel.send(new DataChannel.Buffer(
+                            ByteBuffer.wrap(object.toString().getBytes()),
+                            false));
+//                    Log.e("channel", );
+                    position++;
+                }
+
+        } finally {
+            randomAccessFile.close();
+        }
     }
 
     /**
@@ -43,6 +59,7 @@ public class File2Base64 {
         out.write(buffer);
         out.close();
     }
+
     /**
      * Return Base64-encode string.
      *
@@ -64,6 +81,7 @@ public class File2Base64 {
         if (input == null || input.length() == 0) return new byte[0];
         return Base64.decode(input, Base64.NO_WRAP);
     }
+
     /**
      * <p>将base64字符保存文本文件</p>
      *
@@ -78,14 +96,14 @@ public class File2Base64 {
         out.close();
     }
 
-    public static void main(String[] args) {
-        try {
-            String base64Code = encodeBase64File("/Users/Crazy/Pictures/zyb2.jpg");
-            System.out.println(base64Code);
-            decoderBase64File(base64Code, "/Users/Crazy/Desktop/zyb.png");
-            toFile(base64Code, "/Users/Crazy/Desktop/zyb.txt");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    public static void main(String[] args) {
+//        try {
+//            String base64Code = encodeBase64File("/Users/Crazy/Pictures/zyb2.jpg");
+//            System.out.println(base64Code);
+//            decoderBase64File(base64Code, "/Users/Crazy/Desktop/zyb.png");
+//            toFile(base64Code, "/Users/Crazy/Desktop/zyb.txt");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 }
