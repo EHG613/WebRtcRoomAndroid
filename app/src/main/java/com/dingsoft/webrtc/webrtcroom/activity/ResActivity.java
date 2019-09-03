@@ -148,7 +148,7 @@ public class ResActivity extends AppCompatActivity {
                 holder.textView.setOnClickListener(null);
             }
 
-            if (!ResType.parentDir.equals(mime)) {
+            if (!ResType.parentDir.equals(mime)&&!ResType.dir.equals(mime)) {
                 holder.tvSize.setText(byte2FitMemorySize(size));
             } else {
                 holder.tvSize.setText(null);
@@ -169,11 +169,11 @@ public class ResActivity extends AppCompatActivity {
         } else if (byteNum < 1024) {
             return String.format(Locale.getDefault(), "%dB", byteNum);
         } else if (byteNum < 1048576) {
-            return String.format(Locale.getDefault(), "%dKB", byteNum / 1024);
+            return String.format(Locale.getDefault(), "%.1fKB", byteNum / 1024f);
         } else if (byteNum < 1073741824) {
-            return String.format(Locale.getDefault(), "%dMB", byteNum / 1048576);
+            return String.format(Locale.getDefault(), "%.1fMB", byteNum / 1048576f);
         } else {
-            return String.format(Locale.getDefault(), "%dGB", byteNum / 1073741824);
+            return String.format(Locale.getDefault(), "%.2fGB", byteNum / 1073741824f);
         }
     }
 

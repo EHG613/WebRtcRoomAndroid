@@ -1,13 +1,13 @@
 package com.codyy.live.webtrc;
 
 import android.util.Base64;
-import android.util.Log;
 
 import org.json.JSONObject;
 import org.webrtc.DataChannel;
 
 import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 
 
@@ -32,7 +32,7 @@ public class File2Base64 {
                     object.put("name", path.substring(path.lastIndexOf("/")));
                     object.put("position", position);
                     total+=len;
-                    object.put("percent",total*1f/randomAccessFile.length()*100);
+                    object.put("percent",new BigDecimal(total*1f/randomAccessFile.length()*100).intValue());
                     object.put("file", base64Encode2String(buffer));
                     channel.send(new DataChannel.Buffer(
                             ByteBuffer.wrap(object.toString().getBytes()),
