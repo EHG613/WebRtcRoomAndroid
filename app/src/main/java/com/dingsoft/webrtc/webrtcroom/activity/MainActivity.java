@@ -37,6 +37,7 @@ import com.codyy.live.share.OpenItemEvent;
 import com.codyy.live.share.ResPathEvent;
 import com.codyy.live.share.ResResultEvent;
 import com.codyy.live.share.ResSendFileEvent;
+import com.codyy.live.webtrc.FileProgressListener;
 import com.codyy.live.webtrc.PeerConnectionParameters;
 import com.codyy.live.webtrc.RecorderAction;
 import com.codyy.live.webtrc.Role;
@@ -887,10 +888,31 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         }
     }
 
+    private FileProgressListener fileProgressListener = new FileProgressListener() {
+        @Override
+        public void progress(int progress) {
+            EventBus.getDefault().post(new FileUploadEvent(progress));
+            Log.e("progress", progress + "%");
+            Log.e("name",Thread.currentThread().getName());
+        }
+
+        @Override
+        public void failed(String error) {
+            Log.e("error", error);
+            Log.e("name",Thread.currentThread().getName());
+        }
+
+        @Override
+        public void success(String path) {
+            Log.e("success", path);
+            Log.e("name",Thread.currentThread().getName());
+        }
+    };
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(ResSendFileEvent event) {
         if (webRtcClient != null) {
-            webRtcClient.sendFile(event.getFilePath());
+            webRtcClient.sendFile(event.getFilePath(), fileProgressListener);
         }
     }
 

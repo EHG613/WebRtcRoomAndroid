@@ -5,7 +5,9 @@ import android.util.Base64;
 import org.json.JSONObject;
 import org.webrtc.DataChannel;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
@@ -15,34 +17,54 @@ public class File2Base64 {
     /**
      * <p>将文件转成base64 字符串</p>
      *
-     * @param path 文件路径
+     * @param path                 文件路径
+     * @param fileProgressListener
      * @return
      * @throws Exception
      */
-    public static void encodeBase64File(DataChannel channel, String path) throws Exception {
-        RandomAccessFile randomAccessFile=new RandomAccessFile(path,"r");
-        byte[] buffer = new byte[4096*10];
+    public static void encodeBase64File(DataChannel channel, String path, FileProgressListener fileProgressListener) {
+        RandomAccessFile randomAccessFile = null;
+        byte[] buffer = new byte[4096 * 10];
         try {
-                //分割文件
-                int position = 1;
-                long len=0;
-                long total=0;
-                while ((len=randomAccessFile.read(buffer)) != -1) {
-                    JSONObject object = new JSONObject();
-                    object.put("name", path.substring(path.lastIndexOf("/")));
-                    object.put("position", position);
-                    total+=len;
-                    object.put("percent",new BigDecimal(total*1f/randomAccessFile.length()*100).intValue());
-                    object.put("file", base64Encode2String(buffer));
-                    channel.send(new DataChannel.Buffer(
-                            ByteBuffer.wrap(object.toString().getBytes()),
-                            false));
-//                    Log.e("channel", );
-                    position++;
+            randomAccessFile = new RandomAccessFile(path, "r");
+            //分割文件
+            int position = 1;
+            long len = 0;
+            long total = 0;
+            while ((len = randomAccessFile.read(buffer)) != -1 && DataChannel.State.OPEN.equals(channel.state())) {
+                JSONObject object = new JSONObject();
+                object.put("name", path.substring(path.lastIndexOf("/")));
+                object.put("position", position);
+                total += len;
+                object.put("percent", new BigDecimal(total * 1f / randomAccessFile.length() * 100).intValue());
+                object.put("file", base64Encode2String(buffer));
+                if (channel.send(new DataChannel.Buffer(
+                        ByteBuffer.wrap(object.toString().getBytes()),
+                        false))) {
+                    fileProgressListener.progress(object.optInt("percent"));
+                } else {
+                    fileProgressListener.failed("Datachannel closed");
                 }
-
+//                    Log.e("channel", );
+                position++;
+            }
+            if (total == randomAccessFile.length()) {
+                fileProgressListener.success(path.substring(path.lastIndexOf("/")));
+            }
+        } catch (Exception e) {
+            if (e instanceof FileNotFoundException) {
+                fileProgressListener.failed("failed send file to pc,file not found exception " + path);
+            } else {
+                fileProgressListener.failed("failed send file to pc" + e.getMessage());
+            }
         } finally {
-            randomAccessFile.close();
+            try {
+                if (randomAccessFile != null) {
+                    randomAccessFile.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

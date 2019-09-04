@@ -22,6 +22,7 @@ import com.codyy.live.share.ResPathEvent;
 import com.codyy.live.share.ResResultEvent;
 import com.codyy.live.share.ResSendFileEvent;
 import com.codyy.live.share.ResType;
+import com.codyy.mobile.support.chart.CirclePercentChart;
 import com.dingsoft.webrtc.webrtcroom.R;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.yanzhenjie.permission.AndPermission;
@@ -51,6 +52,7 @@ public class ResActivity extends AppCompatActivity {
     private MyAdapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
     private ListCompositeDisposable listCompositeDisposable = new ListCompositeDisposable();
+    private CirclePercentChart circlePercentChart;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,6 +60,7 @@ public class ResActivity extends AppCompatActivity {
         EventBus.getDefault().register(this);
         setContentView(R.layout.activity_res);
         mRG = findViewById(R.id.rg);
+        circlePercentChart = findViewById(R.id.chart);
         mRv = findViewById(R.id.rv_content);
         setListeners();
         // use a linear layout manager
@@ -150,7 +153,7 @@ public class ResActivity extends AppCompatActivity {
                 holder.textView.setOnClickListener(null);
             }
 
-            if (!ResType.parentDir.equals(mime)&&!ResType.dir.equals(mime)) {
+            if (!ResType.parentDir.equals(mime) && !ResType.dir.equals(mime)) {
                 holder.tvSize.setText(byte2FitMemorySize(size));
             } else {
                 holder.tvSize.setText(null);
@@ -198,6 +201,10 @@ public class ResActivity extends AppCompatActivity {
         if (mAdapter != null) {
             mAdapter.setData(object.optJSONArray("content"));
         }
+    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(FileUploadEvent event) {
+       circlePercentChart.setPercent(event.getProgress());
     }
 
     private void onChecked(int checkedId) {

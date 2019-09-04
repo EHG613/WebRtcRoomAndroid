@@ -634,10 +634,11 @@ public class WebRtcClient {
         p2pExt("recorder", Role.PC, content);
     }
 
-    public void sendFile(String path) {
+    public void sendFile(String path, FileProgressListener fileProgressListener) {
         for (Peer pc : peers.values()) {
             if(Role.PC.equals(pc.getRole())){
-                getOrCreateRtcConnect(pc.getId()).sendFile(path);
+                getOrCreateRtcConnect(pc.getId()).sendFile(path,fileProgressListener);
+                break;
             }
         }
 

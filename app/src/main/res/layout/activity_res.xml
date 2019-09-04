@@ -107,4 +107,18 @@
         app:layout_constraintTop_toTopOf="parent"
         app:title="资源"
         app:titleTextColor="@android:color/white" />
+    <com.codyy.mobile.support.chart.CirclePercentChart
+        android:id="@+id/chart"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:circlePercentBottomText="上传进度"
+        app:circlePercentBottomTextColor="#939fbe"
+        app:circlePercentBottomTextSize="10sp"
+        app:circlePercentEndColor="#F7BE8C"
+        app:circlePercentStartColor="#F26A81"
+        app:circlePercentStyle="percent"
+        app:circlePercentTopTextColor="#f26d80"
+        app:circlePercentTopTextSize="15sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 </android.support.constraint.ConstraintLayout>

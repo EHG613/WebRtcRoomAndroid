@@ -111,29 +111,26 @@ maxRetransmits：重传允许的最大次数；
         });
     }
 
-    public void sendFile(String path) {
+    public void sendFile(String path, FileProgressListener fileProgressListener) {
         Log.e("path", path);
         if (dataChannel != null) {
-            new Thread(new SendFileThread(path)).start();
+            new Thread(new SendFileThread(path,fileProgressListener)).start();
 //            new SendFileThread(path).run();
         }
     }
 
     class SendFileThread implements Runnable {
         String path;
-
-        public SendFileThread(String path) {
+        FileProgressListener fileProgressListener;
+        public SendFileThread(String path, FileProgressListener fileProgressListener) {
             this.path = path;
+            this.fileProgressListener=fileProgressListener;
         }
 
         @Override
         public void run() {
             Log.e("channel", dataChannel.state().name());
-            try {
-                File2Base64.encodeBase64File(dataChannel, path);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                File2Base64.encodeBase64File(dataChannel, path,fileProgressListener);
         }
     }
 
