@@ -132,14 +132,16 @@ public class ResActivity extends AppCompatActivity {
                                     //本地文件夹点击事件处理
                                     showFileDir(path);
                                 } else {
+                                    //获取pc电脑文件夹列表
                                     EventBus.getDefault().post(new ResPathEvent(path));
                                 }
 
-                            } else if (MimeDrawableUtil.isSupportedMimeToOpen(mime)) {//打开文件
+                            } else if (MimeDrawableUtil.isSupportedMimeToOpen(mime)) {//是否是支持打开的文件类型
                                 if (mRG.getCheckedRadioButtonId() == R.id.rb_my_device) {
-                                    //发送文件
+                                    //如果是内置存储文件，则发送到PC后打开发送的文件
                                     EventBus.getDefault().post(new ResSendFileEvent(path));
                                 } else {
+                                    //根据当前文件路径，在PC使用默认打开方式打开文件
                                     holder.textView.setOnClickListener(v -> EventBus.getDefault().post(new OpenItemEvent(path)));
                                 }
                             }

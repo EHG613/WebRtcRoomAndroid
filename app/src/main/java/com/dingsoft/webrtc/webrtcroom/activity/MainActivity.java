@@ -271,15 +271,23 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     /**
      * 初始化共享桌面
      */
+    private RelativeLayout mRlDesktop;
+
     private void initShareDesktop() {
         shareDesktop = findViewById(R.id.desktop);
-        shareDesktop.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (webRtcClient != null) {
-                if (isChecked) {
-                    webRtcClient.shareDesktop();
-                } else {
-                    webRtcClient.closeDesktop();
+        mRlDesktop = findViewById(R.id.rl_desktop);
+        mRlDesktop.setOnClickListener(v -> {
+            if (shareDesktop.isChecked()) {
+                webRtcClient.closeDesktop();
+                shareDesktop.setChecked(false);
+            } else {
+                List<String> items = webRtcClient.getMirrors();
+                if (items == null || items.size() == 0) {
+                    ToastUtils.showShort("未查询到在线客户端");
+                    return;
                 }
+                webRtcClient.shareDesktop();
+                shareDesktop.setChecked(true);
             }
         });
     }
@@ -885,9 +893,10 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             webRtcClient.sendFile(event.getFilePath());
         }
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MirrorClientsEvent event) {
-        if (webRtcClient != null&&event.getMirrors().size()>0) {
+        if (webRtcClient != null && event.getMirrors().size() > 0) {
             webRtcClient.mirror(event.getMirrors());
             mMirror.setChecked(true);
         }
