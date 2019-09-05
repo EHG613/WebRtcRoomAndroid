@@ -1,8 +1,10 @@
 package com.dingsoft.webrtc.webrtcroom.activity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +17,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.codyy.live.share.MimeDrawableUtil;
 import com.codyy.live.share.OpenItemEvent;
 import com.codyy.live.share.ResPath;
@@ -31,6 +34,7 @@ import com.yanzhenjie.permission.Permission;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,9 +52,7 @@ import io.reactivex.internal.disposables.ListCompositeDisposable;
  */
 public class ResActivity extends AppCompatActivity {
     private RadioGroup mRG;
-    private RecyclerView mRv;
     private MyAdapter mAdapter;
-    private RecyclerView.LayoutManager layoutManager;
     private ListCompositeDisposable listCompositeDisposable = new ListCompositeDisposable();
     private CirclePercentChart circlePercentChart;
 
@@ -61,10 +63,10 @@ public class ResActivity extends AppCompatActivity {
         setContentView(R.layout.activity_res);
         mRG = findViewById(R.id.rg);
         circlePercentChart = findViewById(R.id.chart);
-        mRv = findViewById(R.id.rv_content);
+        RecyclerView mRv = findViewById(R.id.rv_content);
         setListeners();
         // use a linear layout manager
-        layoutManager = new LinearLayoutManager(this);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mRv.setLayoutManager(layoutManager);
 
         // specify an adapter (see also next example)
@@ -93,16 +95,17 @@ public class ResActivity extends AppCompatActivity {
         }
 
         // Provide a suitable constructor (depends on the kind of dataset)
-        public MyAdapter(JSONArray myDataset) {
+        MyAdapter(JSONArray myDataset) {
             mDataset = myDataset;
         }
 
-        public void setData(JSONArray mDataset) {
+        void setData(JSONArray mDataset) {
             this.mDataset = mDataset;
             this.notifyDataSetChanged();
         }
 
         // Create new views (invoked by the layout manager)
+        @NotNull
         @Override
         public MyAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent,
                                                          int viewType) {
@@ -142,15 +145,46 @@ public class ResActivity extends AppCompatActivity {
                             } else if (MimeDrawableUtil.isSupportedMimeToOpen(mime)) {//是否是支持打开的文件类型
                                 if (mRG.getCheckedRadioButtonId() == R.id.rb_my_device) {
                                     //如果是内置存储文件，则发送到PC后打开发送的文件
-                                    EventBus.getDefault().post(new ResSendFileEvent(path));
+                                    if (circlePercentChart.getVisibility() == View.VISIBLE) {
+                                        ToastUtils.showShort("文件上传中，请稍后");
+                                    } else {
+                                        new AlertDialog.Builder(holder.textView.getContext())
+                                                .setTitle("提示")
+                                                .setMessage("上传 " + fileName + " 至我的电脑?")
+                                                .setCancelable(true)
+                                                .setNegativeButton("取消", (dialog, which) -> {
+
+                                                })
+                                                .setPositiveButton("上传", (dialog, which) -> {
+                                                    EventBus.getDefault().post(new ResSendFileEvent(path));
+                                                })
+                                                .create()
+                                                .show();
+
+                                    }
                                 } else {
                                     //根据当前文件路径，在PC使用默认打开方式打开文件
-                                    holder.textView.setOnClickListener(v -> EventBus.getDefault().post(new OpenItemEvent(path)));
+                                    holder.textView.setOnClickListener(v -> {
+                                        new AlertDialog.Builder(holder.textView.getContext())
+                                                .setTitle("提示")
+                                                .setMessage("是否在我的电脑打开文件 " + fileName + "?")
+                                                .setCancelable(true)
+                                                .setNegativeButton("取消", (dialog, which) -> {
+
+                                                })
+                                                .setPositiveButton("打开", (dialog, which) -> {
+                                                    EventBus.getDefault().post(new OpenItemEvent(path));
+                                                })
+                                                .create()
+                                                .show();
+                                    });
                                 }
                             }
                         }));
             } else {
-                holder.textView.setOnClickListener(null);
+                holder.textView.setOnClickListener(v -> {
+                    ToastUtils.showShort("不支持的文件类型");
+                });
             }
 
             if (!ResType.parentDir.equals(mime) && !ResType.dir.equals(mime)) {
@@ -185,7 +219,19 @@ public class ResActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (listCompositeDisposable != null) {
+            listCompositeDisposable.clear();
+        }
         EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (circlePercentChart.getVisibility() == View.VISIBLE) {
+            ToastUtils.showShort("文件上传中，请稍后...");
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void setListeners() {
@@ -202,9 +248,26 @@ public class ResActivity extends AppCompatActivity {
             mAdapter.setData(object.optJSONArray("content"));
         }
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(FileUploadEvent event) {
-       circlePercentChart.setPercent(event.getProgress());
+        switch (event.getState()) {
+            case FileUploadEvent.FILE_UPLOADING:
+                if (circlePercentChart.getVisibility() != View.VISIBLE) {
+                    circlePercentChart.setVisibility(View.VISIBLE);
+                }
+                circlePercentChart.setPercent(event.getProgress());
+                break;
+            case FileUploadEvent.FILE_UPLOAD_FAILED:
+                ToastUtils.showShort("文件上传失败");
+                circlePercentChart.setVisibility(View.GONE);
+                break;
+            case FileUploadEvent.FILE_UPLOAD_SUCCESS:
+                ToastUtils.showShort("文件上传成功，可在我的电脑-文档中打开");
+                circlePercentChart.postDelayed(() -> circlePercentChart.setVisibility(View.GONE), 1000L);
+                break;
+        }
+
     }
 
     private void onChecked(int checkedId) {

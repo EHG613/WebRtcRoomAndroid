@@ -111,6 +111,7 @@
         android:id="@+id/chart"
         android:layout_width="100dp"
         android:layout_height="100dp"
+        android:visibility="gone"
         app:circlePercentBottomText="上传进度"
         app:circlePercentBottomTextColor="#939fbe"
         app:circlePercentBottomTextSize="10sp"

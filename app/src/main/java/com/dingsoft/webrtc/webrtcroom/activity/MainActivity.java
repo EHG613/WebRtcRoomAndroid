@@ -891,7 +891,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     private FileProgressListener fileProgressListener = new FileProgressListener() {
         @Override
         public void progress(int progress) {
-            EventBus.getDefault().post(new FileUploadEvent(progress));
+            EventBus.getDefault().post(new FileUploadEvent(progress, FileUploadEvent.FILE_UPLOADING));
             Log.e("progress", progress + "%");
             Log.e("name",Thread.currentThread().getName());
         }
@@ -900,12 +900,14 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         public void failed(String error) {
             Log.e("error", error);
             Log.e("name",Thread.currentThread().getName());
+            EventBus.getDefault().post(new FileUploadEvent(FileUploadEvent.FILE_UPLOAD_FAILED));
         }
 
         @Override
         public void success(String path) {
             Log.e("success", path);
             Log.e("name",Thread.currentThread().getName());
+            EventBus.getDefault().post(new FileUploadEvent(FileUploadEvent.FILE_UPLOAD_SUCCESS));
         }
     };
 
