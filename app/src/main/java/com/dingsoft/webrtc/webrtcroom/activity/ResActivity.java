@@ -1,6 +1,5 @@
 package com.dingsoft.webrtc.webrtcroom.activity;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
