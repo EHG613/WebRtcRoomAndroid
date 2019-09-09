@@ -106,6 +106,7 @@ public class PortWorkLifecycle implements LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     public void onDestroy() {
+        sPort = sDefaultPort;
         WorkManager.getInstance().cancelAllWork();
         fragmentActivity = null;
     }
