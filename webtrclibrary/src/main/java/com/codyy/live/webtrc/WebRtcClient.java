@@ -248,10 +248,24 @@ public class WebRtcClient {
                     signalingListener.disconnect();
                 }
             });
+            client.on(Socket.EVENT_CONNECT_TIMEOUT,args -> {
+//                JSONObject data = (JSONObject) args[0];
+//                Log.e("Socket",data.toString());
+
+            });
+            client.on(Socket.EVENT_CONNECT_ERROR,args -> {
+//                JSONObject data = (JSONObject) args[0];
+//                Log.e("Socket",data.toString());
+            });
+            client.on(Socket.EVENT_ERROR,args -> {
+//                JSONObject data = (JSONObject) args[0];
+//                Log.e("Socket",data.toString());
+            });
             ////设置消息监听
             //created [id,room,peers]
             client.on("created", createdListener);
             client.on("empty", emptyListener);
+            client.on("room", roomListener);
             client.on("res", resListener);
             //joined [id,room]
             client.on("joined", joinedListener);
@@ -828,6 +842,13 @@ public class WebRtcClient {
             if (rtcListener != null) {
                 rtcListener.onEmpty();
             }
+        }
+    };
+    private Emitter.Listener roomListener = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            Log.e(TAG, "room:" + args[0]);
+            if(rtcListener!=null)rtcListener.autoRoom(args[0].toString());
         }
     };
     private Emitter.Listener resListener = new Emitter.Listener() {

@@ -26,7 +26,6 @@ import com.codyy.live.share.ResSendFileEvent;
 import com.codyy.live.share.ResType;
 import com.codyy.mobile.support.chart.CirclePercentChart;
 import com.dingsoft.webrtc.webrtcroom.R;
-import com.jakewharton.rxbinding2.view.RxView;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.Permission;
 
@@ -40,10 +39,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
-
-import io.reactivex.Observable;
-import io.reactivex.internal.disposables.ListCompositeDisposable;
 
 /**
  * created by lijian on 2019/08/19
@@ -52,7 +47,6 @@ import io.reactivex.internal.disposables.ListCompositeDisposable;
 public class ResActivity extends AppCompatActivity {
     private RadioGroup mRG;
     private MyAdapter mAdapter;
-    private ListCompositeDisposable listCompositeDisposable = new ListCompositeDisposable();
     private CirclePercentChart circlePercentChart;
 
     @Override
@@ -115,9 +109,6 @@ public class ResActivity extends AppCompatActivity {
             return vh;
         }
 
-        private Observable<Object> setListener(View view) {
-            return RxView.clicks(view).throttleFirst(500L, TimeUnit.MILLISECONDS);
-        }
 
         // Replace the contents of a view (invoked by the layout manager)
         @Override
@@ -130,56 +121,53 @@ public class ResActivity extends AppCompatActivity {
             long size = mDataset.optJSONObject(position).optLong("size");
             holder.textView.setText(fileName);
             if (ResType.parentDir.equals(mime) || ResType.dir.equals(mime) || MimeDrawableUtil.isSupportedMimeToOpen(mime)) {
-                listCompositeDisposable.add(setListener(holder.textView)
-                        .subscribe(o -> {
-                            if (ResType.parentDir.equals(mime) || ResType.dir.equals(mime)) {//打开文件夹
-                                if (mRG.getCheckedRadioButtonId() == R.id.rb_my_device) {
-                                    //本地文件夹点击事件处理
-                                    showFileDir(path);
-                                } else {
-                                    //获取pc电脑文件夹列表
-                                    EventBus.getDefault().post(new ResPathEvent(path));
-                                }
+                holder.textView.setOnClickListener(v -> {
+                    if (ResType.parentDir.equals(mime) || ResType.dir.equals(mime)) {//打开文件夹
+                        if (mRG.getCheckedRadioButtonId() == R.id.rb_my_device) {
+                            //本地文件夹点击事件处理
+                            showFileDir(path);
+                        } else {
+                            //获取pc电脑文件夹列表
+                            EventBus.getDefault().post(new ResPathEvent(path));
+                        }
 
-                            } else if (MimeDrawableUtil.isSupportedMimeToOpen(mime)) {//是否是支持打开的文件类型
-                                if (mRG.getCheckedRadioButtonId() == R.id.rb_my_device) {
-                                    //如果是内置存储文件，则发送到PC后打开发送的文件
-                                    if (circlePercentChart.getVisibility() == View.VISIBLE) {
-                                        ToastUtils.showShort("文件上传中，请稍后");
-                                    } else {
-                                        new AlertDialog.Builder(holder.textView.getContext())
-                                                .setTitle("提示")
-                                                .setMessage("上传 " + fileName + " 至我的电脑?")
-                                                .setCancelable(true)
-                                                .setNegativeButton("取消", (dialog, which) -> {
+                    } else if (MimeDrawableUtil.isSupportedMimeToOpen(mime)) {//是否是支持打开的文件类型
+                        if (mRG.getCheckedRadioButtonId() == R.id.rb_my_device) {
+                            //如果是内置存储文件，则发送到PC后打开发送的文件
+                            if (circlePercentChart.getVisibility() == View.VISIBLE) {
+                                ToastUtils.showShort("文件上传中，请稍后");
+                            } else {
+                                new AlertDialog.Builder(holder.textView.getContext())
+                                        .setTitle("提示")
+                                        .setMessage("上传 " + fileName + " 至我的电脑?")
+                                        .setCancelable(true)
+                                        .setNegativeButton("取消", (dialog, which) -> {
 
-                                                })
-                                                .setPositiveButton("上传", (dialog, which) -> {
-                                                    EventBus.getDefault().post(new ResSendFileEvent(path));
-                                                })
-                                                .create()
-                                                .show();
+                                        })
+                                        .setPositiveButton("上传", (dialog, which) -> {
+                                            EventBus.getDefault().post(new ResSendFileEvent(path));
+                                        })
+                                        .create()
+                                        .show();
 
-                                    }
-                                } else {
-                                    //根据当前文件路径，在PC使用默认打开方式打开文件
-                                    holder.textView.setOnClickListener(v -> {
-                                        new AlertDialog.Builder(holder.textView.getContext())
-                                                .setTitle("提示")
-                                                .setMessage("是否在我的电脑打开文件 " + fileName + "?")
-                                                .setCancelable(true)
-                                                .setNegativeButton("取消", (dialog, which) -> {
-
-                                                })
-                                                .setPositiveButton("打开", (dialog, which) -> {
-                                                    EventBus.getDefault().post(new OpenItemEvent(path));
-                                                })
-                                                .create()
-                                                .show();
-                                    });
-                                }
                             }
-                        }));
+                        } else {
+                            //根据当前文件路径，在PC使用默认打开方式打开文件
+                                new AlertDialog.Builder(holder.textView.getContext())
+                                        .setTitle("提示")
+                                        .setMessage("是否在我的电脑打开文件 " + fileName + "?")
+                                        .setCancelable(true)
+                                        .setNegativeButton("取消", (dialog, which) -> {
+
+                                        })
+                                        .setPositiveButton("打开", (dialog, which) -> {
+                                            EventBus.getDefault().post(new OpenItemEvent(path));
+                                        })
+                                        .create()
+                                        .show();
+                        }
+                    }
+                });
             } else {
                 holder.textView.setOnClickListener(v -> {
                     ToastUtils.showShort("不支持的文件类型");
@@ -218,9 +206,6 @@ public class ResActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (listCompositeDisposable != null) {
-            listCompositeDisposable.clear();
-        }
         EventBus.getDefault().unregister(this);
     }
 

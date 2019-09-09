@@ -1,6 +1,5 @@
 package com.dingsoft.webrtc.webrtcroom.activity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -11,6 +10,7 @@ import android.support.constraint.Group;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -395,12 +395,24 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             @Override
             public void NetWorkError() {
                 stateLayout.showNoNetworkView();
+                new AlertDialog.Builder(openCamera.getContext())
+                        .setTitle("提示").setMessage("网络错误,请稍后再试")
+                        .setCancelable(false)
+                        .setPositiveButton("退出",(dialog, which) -> {
+                            finish();
+                        }).create().show();
 //                Toast.makeText(getApplicationContext(), "网络错误", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void NotFound() {
                 stateLayout.showTimeoutView();
+                new AlertDialog.Builder(openCamera.getContext())
+                        .setTitle("提示").setMessage("未搜索到PC客户端，请确认是否已打开PC客户端再进行操作")
+                        .setCancelable(false)
+                        .setPositiveButton("退出",(dialog, which) -> {
+                            finish();
+                        }).create().show();
 //                Toast.makeText(getApplicationContext(), "未搜索到PC客户端，请确认是否已打开PC客户端再进行操作", Toast.LENGTH_LONG).show();
             }
         });
@@ -560,16 +572,17 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
 
     //创建配置参数
     private void createPeerConnectionParameters() {
-        getCameraInfo();
+//        getCameraInfo();
         //获取webRtc 音视频配置参数
         Point displaySize = new Point();
         this.getWindowManager().getDefaultDisplay().getSize(displaySize);
         Log.i("displaySize:", displaySize.x + "*" + displaySize.y);
-        displaySize.set(640, 480);//设置画面的大小
+//        displaySize.set(640, 480);//设置画面的大小
+        displaySize.set(1280, 720);//设置画面的大小
         peerConnectionParameters = new PeerConnectionParameters(true, false,
-                false, displaySize.x, displaySize.y, 20,
-                0, "H264 High",
-                true, false, 0, "OPUS",
+                false, displaySize.x, displaySize.y, 25,
+                0, "H264 High",//H264 High
+                false, false, 0, "OPUS",
                 false, false, false, false, false, false,
                 false, false, false, false);
     }
@@ -872,6 +885,30 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     @Override
     public void onResResult(JSONObject jsonObject) {
         EventBus.getDefault().post(new ResResultEvent(jsonObject));
+    }
+
+    @Override
+    public void autoRoom(String room) {
+        if (TextUtils.isEmpty(room) || room.length() != 6) return;
+        runOnUiThread(() -> {
+            new AlertDialog.Builder(this).setTitle("提示")
+                    .setMessage("发现课堂：" + room + ",是否自动加入")
+                    .setCancelable(false)
+                    .setNegativeButton("否", (dialog, which) -> {
+
+                    })
+                    .setPositiveButton("加入", (dialog, which) -> {
+                        et1.setText(room.charAt(0)+"");
+                        et2.setText(room.charAt(1)+"");
+                        et3.setText(room.charAt(2)+"");
+                        et4.setText(room.charAt(3)+"");
+                        et5.setText(room.charAt(4)+"");
+                        et6.setText(room.charAt(5)+"");
+                        findViewById(R.id.create).performClick();
+                    })
+                    .create()
+                    .show();
+        });
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

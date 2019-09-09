@@ -7,7 +7,7 @@ android {
 
 
     defaultConfig {
-        applicationId "com.codyy.live.stu"
+        applicationId "com.codyy.classroompad.multi.stu"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1

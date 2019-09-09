@@ -33,4 +33,10 @@ public interface RtcListener {
      * @param jsonObject
      */
     void onResResult(JSONObject jsonObject);
+
+    /**
+     * 自动发现课堂号
+     * @param room
+     */
+    void autoRoom(String room);
 }

@@ -8,8 +8,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
 import android.support.constraint.Group;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
@@ -230,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         });
         startScreenCapture();
     }
+
     private void getNumLength(EditText... editText) {
         int i = 0;
         for (EditText text : editText) {
@@ -237,6 +240,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         }
         createRoom.setEnabled(i == 6);
     }
+
     private static final int CAPTURE_PERMISSION_REQUEST_CODE = 1;
 
     @TargetApi(21)
@@ -276,12 +280,25 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             @Override
             public void NetWorkError() {
                 stateLayout.showNoNetworkView();
+                new AlertDialog.Builder(openCamera.getContext())
+                        .setTitle("提示").setMessage("网络错误,请稍后再试")
+                        .setCancelable(false)
+                        .setPositiveButton("退出",(dialog, which) -> {
+                            finish();
+                        }).create().show();
+
 //                Toast.makeText(getApplicationContext(), "网络错误", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void NotFound() {
                 stateLayout.showTimeoutView();
+                new AlertDialog.Builder(openCamera.getContext())
+                        .setTitle("提示").setMessage("未搜索到PC客户端，请确认是否已打开PC客户端再进行操作")
+                        .setCancelable(false)
+                        .setPositiveButton("退出",(dialog, which) -> {
+                            finish();
+                        }).create().show();
 //                Toast.makeText(getApplicationContext(), "未搜索到PC客户端，请确认是否已打开PC客户端再进行操作", Toast.LENGTH_LONG).show();
             }
         });
@@ -580,5 +597,29 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     @Override
     public void onResResult(JSONObject jsonObject) {
 
+    }
+
+    @Override
+    public void autoRoom(String room) {
+        if (TextUtils.isEmpty(room) || room.length() != 6) return;
+        runOnUiThread(() -> {
+            new AlertDialog.Builder(this).setTitle("提示")
+                    .setMessage("发现课堂：" + room + ",是否自动加入")
+                    .setCancelable(false)
+                    .setNegativeButton("否", (dialog, which) -> {
+
+                    })
+                    .setPositiveButton("加入", (dialog, which) -> {
+                        et1.setText(room.charAt(0)+"");
+                        et2.setText(room.charAt(1)+"");
+                        et3.setText(room.charAt(2)+"");
+                        et4.setText(room.charAt(3)+"");
+                        et5.setText(room.charAt(4)+"");
+                        et6.setText(room.charAt(5)+"");
+                        findViewById(R.id.create).performClick();
+                    })
+                    .create()
+                    .show();
+        });
     }
 }

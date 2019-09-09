@@ -131,7 +131,22 @@
         sl:layout_constraintEnd_toEndOf="parent"
         sl:layout_constraintStart_toStartOf="parent"
         sl:layout_constraintTop_toTopOf="parent" />
-
+<TextView
+    android:id="@+id/tv_stu_title"
+    android:layout_width="wrap_content"
+    android:padding="8dp"
+    sl:layout_constraintTop_toTopOf="parent"
+    android:text="学生端"
+    android:textColor="@android:color/black"
+    sl:layout_constraintStart_toStartOf="parent"
+    android:layout_height="wrap_content"/>
+    <TextView
+        android:paddingStart="8dp"
+        android:layout_width="wrap_content"
+        sl:layout_constraintTop_toBottomOf="@id/tv_stu_title"
+        android:text="仅作广播投屏和镜像同屏使用"
+        sl:layout_constraintStart_toStartOf="parent"
+        android:layout_height="wrap_content"/>
     <EditText
         android:id="@+id/et1"
         android:layout_width="32dp"
