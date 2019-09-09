@@ -18,8 +18,6 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -72,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     private EditText roomName, et1, et2, et3, et4, et5, et6;
     private Group mGroup;
     private Button openCamera, switchCamera, createRoom, exitRoom;
-    private Button mFullScreen, mEsc, mClose, mPenOrMouse, mBtnRes;
+    private Button mFullScreen, mEsc, mClose,  mBtnRes;
     private StateLayout stateLayout;
     private SurfaceViewRenderer localSurfaceViewRenderer;
     private LinearLayout remoteVideoLl;
@@ -86,26 +84,40 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     private CheckBox mCbMenuRecorder, mCbRecorderStartOrStop, mCbRecorderPauseOrResume;
     private CheckBox mCbMenuPhysical, mCbPhysicalStartOrStop, mCbPhysicalSwitch;
     private CheckBox shareDesktop;
-    private CheckBox mMirror;
+    private CheckBox mMirror,mPenOrMouse;
     //记录用户首次点击返回键的时间
     private long firstTime = 0;
     //摄像头是否开启
     private boolean isCameraOpen = false;
     private PortWorkLifecycle portWorkLifecycle;
     private Spark mSpark;
-
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().addFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
-                        | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION
-                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                        | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        //去除标题栏
+//        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //去除状态栏
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        getWindow().addFlags(
+//                WindowManager.LayoutParams.FLAG_FULLSCREEN
+//                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+//                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+//                        | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION
+//                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+//                        | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.activity_main);
         mSpark = new Spark.Builder().
                 setView(findViewById(R.id.v_num_1))
@@ -116,6 +128,8 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         initRecoder();
         initPhysical();
         mFullScreen = findViewById(R.id.btn_fullscreen);
+        findViewById(R.id.btn_down).setOnClickListener(this);
+        findViewById(R.id.btn_up).setOnClickListener(this);
         mBtnRes = findViewById(R.id.btn_res);
         mBtnRes.setOnClickListener(this);
         mGroup = findViewById(R.id.group);
@@ -511,26 +525,32 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 break;
             case R.id.btn_esc:
                 if (webRtcClient != null) {
-                    mPenOrMouse.setText("鼠标");
+                    mPenOrMouse.setChecked(false);
+//                    mPenOrMouse.setText("鼠标");
                     webRtcClient.onPPTDrawScreen("mouse");
                     webRtcClient.onESCFullScreen();
                 }
                 break;
             case R.id.btn_close:
                 if (webRtcClient != null) {
-                    mPenOrMouse.setText("鼠标");
+//                    mPenOrMouse.setText("鼠标");
+                    mPenOrMouse.setChecked(false);
                     webRtcClient.onPPTDrawScreen("mouse");
                     webRtcClient.onClosePPTScreen();
                 }
                 break;
             case R.id.btn_pen_mouse:
-                if ("鼠标".equals(mPenOrMouse.getText().toString())) {
-                    mPenOrMouse.setText("画笔");
+                if(mPenOrMouse.isChecked()){
                     if (webRtcClient != null) webRtcClient.onPPTDrawScreen("pen");
-                } else {
-                    mPenOrMouse.setText("鼠标");
+                }else{
                     if (webRtcClient != null) webRtcClient.onPPTDrawScreen("mouse");
                 }
+                break;
+            case R.id.btn_down:
+                if (webRtcClient != null) webRtcClient.onPageDown("down");
+                break;
+            case R.id.btn_up:
+                if (webRtcClient != null) webRtcClient.onPageDown("up");
                 break;
             case R.id.btn_res:
                 startActivity(new Intent(this, ResActivity.class));
@@ -561,6 +581,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                     }
                     createRoom.setEnabled(true);
                     finish();
+                    System.exit(0);
                 })
                 .setNegativeButton("取消", (dialog, which) -> {
 

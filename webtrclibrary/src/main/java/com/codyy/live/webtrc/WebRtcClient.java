@@ -570,6 +570,16 @@ public class WebRtcClient {
         }
         p2pExt("action", Role.PC, content);
     }
+    public void onPageDown(String type) {
+        JSONObject content = new JSONObject();
+        try {
+            content.put("action", "page");
+            content.put("type", type);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        p2pExt("action", Role.PC, content);
+    }
 
     /**
      * PPT画笔
