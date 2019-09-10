@@ -831,7 +831,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 });
                 remoteView.setOnTouchListener((v, event) -> {
 //                    Log.e("onTouch",event.getX()+":"+event.getY());
-                    if ("画笔".equals(mPenOrMouse.getText().toString()) && webRtcClient != null) {
+                    if (mPenOrMouse.isChecked() && webRtcClient != null) {
                         if (event.getAction() == MotionEvent.ACTION_DOWN) {
                             webRtcClient.onDrag("down", getRealX(event.getX(), width), getRealY(event.getY(), height));
                         } else if (event.getAction() == MotionEvent.ACTION_UP) {
