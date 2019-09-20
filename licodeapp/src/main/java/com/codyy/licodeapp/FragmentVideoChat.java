@@ -518,7 +518,7 @@ public class FragmentVideoChat extends Fragment {
         COCO.getDefault().bind(getActivity(), host, new COCOListener() {
             @Override
             public void onOpen() {
-                Log.e("onMessage", "coco opened");
+                Log.i("onMessage", "coco opened");
                 timer.schedule(new TimerTask() {
 
                     @Override
@@ -531,7 +531,7 @@ public class FragmentVideoChat extends Fragment {
 
             @Override
             public void onMessage(String message) {
-                Log.e("onMessage", message);
+                Log.i("onMessage", message);
                 if (message.contains("sid")) {
                     try {
                         JSONObject object = new JSONObject();
@@ -550,7 +550,7 @@ public class FragmentVideoChat extends Fragment {
 
             @Override
             public void onClose(int code, String reason, boolean remote) {
-                Log.e("onClose", code + reason);//10086
+                Log.i("onClose", code + reason);//10086
             }
 
             @Override
