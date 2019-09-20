@@ -1,1 +1,1 @@
-include ':app', ':webtrclibrary', ':stu', ':sharelibrary'
+include ':app', ':webtrclibrary', ':stu', ':sharelibrary', ':licodeapp'

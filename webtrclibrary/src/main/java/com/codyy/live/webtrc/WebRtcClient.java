@@ -280,7 +280,6 @@ public class WebRtcClient {
             client.on("exit", exitListener);
             //开始连接
             client.connect();
-
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -999,7 +998,7 @@ public class WebRtcClient {
     /**
      * 信令服务器发送消息
      **/
-    public void sendMessage(String event, JSONObject message) {
+    public synchronized void sendMessage(String event, final Object...  message) {
         client.emit(event, message);
     }
 
