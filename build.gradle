@@ -6,6 +6,7 @@ buildscript {
         maven {
             url 'http://men.codyy.cn/artifactory/group_mobile/'
         }
+        google()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.0'
@@ -20,6 +21,7 @@ allprojects {
         maven {
             url 'http://men.codyy.cn/artifactory/group_mobile/'
         }
+        google()
     }
 }
 

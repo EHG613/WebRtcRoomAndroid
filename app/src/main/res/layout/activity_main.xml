@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:sl="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -382,13 +382,13 @@
         sl:layout_constraintEnd_toEndOf="@id/v_num"
         sl:layout_constraintStart_toStartOf="@id/v_num" />
 
-    <android.support.constraint.Group
+    <androidx.constraintlayout.widget.Group
         android:id="@+id/group"
         android:layout_width="wrap_content"
         tools:visibility="gone"
         android:layout_height="wrap_content"
         sl:constraint_referenced_ids="v_num,v_num_1,et1,et2,et3,et4,et5,et6,create,tv_title" />
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
         android:orientation="horizontal"
         sl:layout_constraintGuide_percent="0.67"
@@ -464,4 +464,4 @@
             />
 
     </LinearLayout>
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

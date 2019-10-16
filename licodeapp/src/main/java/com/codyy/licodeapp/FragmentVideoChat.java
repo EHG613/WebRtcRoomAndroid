@@ -6,9 +6,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.security.SecureRandom;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -19,8 +17,8 @@ import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.text.TextUtils;
+import androidx.fragment.app.Fragment;
+
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
@@ -40,14 +38,6 @@ import com.codyy.licodeapp.apprtc.VideoStreamsView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-
-import io.socket.client.IO;
-import io.socket.client.Socket;
-import okhttp3.OkHttpClient;
 
 import static com.codyy.licodeapp.LicodeConnector.log;
 

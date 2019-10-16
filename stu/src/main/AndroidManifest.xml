@@ -15,19 +15,32 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <application
+        android:name=".openlive.AgoraApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".StuLocalActivity"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="landscape">
+
+        </activity>
+        <activity
+            android:name=".openlive.activities.LiveActivity"
+            android:screenOrientation="landscape">
+
+        </activity>
+        <activity
+            android:name=".openlive.activities.RoleActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
             </intent-filter>
         </activity>
     </application>

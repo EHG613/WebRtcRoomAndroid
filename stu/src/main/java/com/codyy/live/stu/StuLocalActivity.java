@@ -7,9 +7,9 @@ import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
-import android.support.constraint.Group;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.constraintlayout.widget.Group;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -48,7 +48,7 @@ import org.webrtc.VideoTrack;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements RtcListener, View.OnClickListener {
+public class StuLocalActivity extends AppCompatActivity implements RtcListener, View.OnClickListener {
 
     //控件
     private EditText roomName, et1, et2, et3, et4, et5, et6;
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                         | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION
                         | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_stu_local);
         mGroup = findViewById(R.id.group);
         et1 = findViewById(R.id.et1);
         et2 = findViewById(R.id.et2);
@@ -330,7 +330,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
             case KeyEvent.KEYCODE_BACK:
                 long secondTime = System.currentTimeMillis();
                 if (secondTime - firstTime > 2000) {
-                    Toast.makeText(MainActivity.this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(StuLocalActivity.this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
                     firstTime = secondTime;
                     return true;
                 } else {
@@ -438,7 +438,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         webRtcClient = new WebRtcClient(getApplicationContext(),
                 rootEglBase,
                 peerConnectionParameters,
-                MainActivity.this,
+                StuLocalActivity.this,
                 host);
         webRtcClient.setSignalingListener(() -> {
             runOnUiThread(() -> {
@@ -468,7 +468,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                         @Override
                         public void onAction(List<String> data) {
                             //当用户没有允许该权限时，回调该方法
-                            Toast.makeText(MainActivity.this, "没有获取照相机权限，该功能无法使用", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(StuLocalActivity.this, "没有获取照相机权限，该功能无法使用", Toast.LENGTH_SHORT).show();
                         }
                     }).start();
         }
@@ -515,7 +515,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 }
                 ////UI线程执行
                 //构建远端view
-                SurfaceViewRenderer remoteView = new SurfaceViewRenderer(MainActivity.this);
+                SurfaceViewRenderer remoteView = new SurfaceViewRenderer(StuLocalActivity.this);
                 //初始化渲染源
                 remoteView.init(rootEglBase.getEglBaseContext(), null);
                 //填充模式
@@ -524,7 +524,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 remoteView.setEnableHardwareScaler(false);
                 remoteView.setMirror(false);
                 //控件布局
-                int width = Integer.parseInt(DeviceUtils.getScreenWidth(MainActivity.this));
+                int width = Integer.parseInt(DeviceUtils.getScreenWidth(StuLocalActivity.this));
                 int height = width * 9 / 16;
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
 //                layoutParams.topMargin = 20;

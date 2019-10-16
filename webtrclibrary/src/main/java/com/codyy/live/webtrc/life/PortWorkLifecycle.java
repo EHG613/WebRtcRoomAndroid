@@ -1,9 +1,9 @@
 package com.codyy.live.webtrc.life;
 
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.OnLifecycleEvent;
-import android.support.v4.app.FragmentActivity;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
+import androidx.fragment.app.FragmentActivity;
 
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
