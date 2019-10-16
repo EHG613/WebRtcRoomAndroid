@@ -58,6 +58,6 @@ public abstract class RtcBaseActivity extends BaseActivity implements EventHandl
         super.onDestroy();
         removeRtcEventHandler(this);
         rtcEngine().leaveChannel();
-        RtcEngine.destroy();
+//        RtcEngine.destroy();
     }
 }

@@ -6,9 +6,11 @@ import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.hardware.Camera;
 import android.os.Bundle;
+
 import androidx.constraintlayout.widget.Group;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     private EditText roomName, et1, et2, et3, et4, et5, et6;
     private Group mGroup;
     private Button openCamera, switchCamera, createRoom, exitRoom;
-    private Button mFullScreen, mEsc, mClose,  mBtnRes;
+    private Button mFullScreen, mEsc, mClose, mBtnRes;
     private StateLayout stateLayout;
     private SurfaceViewRenderer localSurfaceViewRenderer;
     private LinearLayout remoteVideoLl;
@@ -83,14 +85,15 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     private PeerConnectionParameters peerConnectionParameters;
     private CheckBox mCbMenuRecorder, mCbRecorderStartOrStop, mCbRecorderPauseOrResume;
     private CheckBox mCbMenuPhysical, mCbPhysicalStartOrStop, mCbPhysicalSwitch;
-    private CheckBox shareDesktop;
-    private CheckBox mMirror,mPenOrMouse;
+    private CheckBox shareDesktop, remoteShare;
+    private CheckBox mMirror, mPenOrMouse;
     //记录用户首次点击返回键的时间
     private long firstTime = 0;
     //摄像头是否开启
     private boolean isCameraOpen = false;
     private PortWorkLifecycle portWorkLifecycle;
     private Spark mSpark;
+
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -101,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                             | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -259,6 +263,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         exitRoom = findViewById(R.id.exit);
         exitRoom.setOnClickListener(this);
         initShareDesktop();
+        initRemoteShareDesktop();
         initMirror();
         findViewById(R.id.stopCapture).setOnClickListener(this);
         findViewById(R.id.startCapture).setOnClickListener(this);
@@ -286,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
     /**
      * 初始化共享桌面
      */
-    private RelativeLayout mRlDesktop;
+    private RelativeLayout mRlDesktop, mRlRemote;
 
     private void initShareDesktop() {
         shareDesktop = findViewById(R.id.desktop);
@@ -303,6 +308,25 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 }
                 webRtcClient.shareDesktop();
                 shareDesktop.setChecked(true);
+            }
+        });
+    }
+
+    private void initRemoteShareDesktop() {
+        remoteShare = findViewById(R.id.remote_desktop);
+        mRlRemote = findViewById(R.id.rl_remote_desktop);
+        mRlRemote.setOnClickListener(v -> {
+            if (remoteShare.isChecked()) {
+                webRtcClient.remoteShareClose();
+                remoteShare.setChecked(false);
+            } else {
+//                List<String> items = webRtcClient.getMirrors();
+//                if (items == null || items.size() == 0) {
+//                    ToastUtils.showShort("未查询到在线客户端");
+//                    return;
+//                }
+                webRtcClient.remoteShare();
+                remoteShare.setChecked(true);
             }
         });
     }
@@ -412,7 +436,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 new AlertDialog.Builder(openCamera.getContext())
                         .setTitle("提示").setMessage("网络错误,请稍后再试")
                         .setCancelable(false)
-                        .setPositiveButton("退出",(dialog, which) -> {
+                        .setPositiveButton("退出", (dialog, which) -> {
                             finish();
                         }).create().show();
 //                Toast.makeText(getApplicationContext(), "网络错误", Toast.LENGTH_LONG).show();
@@ -424,7 +448,7 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 new AlertDialog.Builder(openCamera.getContext())
                         .setTitle("提示").setMessage("未搜索到PC客户端，请确认是否已打开PC客户端再进行操作")
                         .setCancelable(false)
-                        .setPositiveButton("退出",(dialog, which) -> {
+                        .setPositiveButton("退出", (dialog, which) -> {
                             finish();
                         }).create().show();
 //                Toast.makeText(getApplicationContext(), "未搜索到PC客户端，请确认是否已打开PC客户端再进行操作", Toast.LENGTH_LONG).show();
@@ -540,9 +564,9 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
                 }
                 break;
             case R.id.btn_pen_mouse:
-                if(mPenOrMouse.isChecked()){
+                if (mPenOrMouse.isChecked()) {
                     if (webRtcClient != null) webRtcClient.onPPTDrawScreen("pen");
-                }else{
+                } else {
                     if (webRtcClient != null) webRtcClient.onPPTDrawScreen("mouse");
                 }
                 break;
@@ -919,12 +943,12 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
 
                     })
                     .setPositiveButton("加入", (dialog, which) -> {
-                        et1.setText(room.charAt(0)+"");
-                        et2.setText(room.charAt(1)+"");
-                        et3.setText(room.charAt(2)+"");
-                        et4.setText(room.charAt(3)+"");
-                        et5.setText(room.charAt(4)+"");
-                        et6.setText(room.charAt(5)+"");
+                        et1.setText(room.charAt(0) + "");
+                        et2.setText(room.charAt(1) + "");
+                        et3.setText(room.charAt(2) + "");
+                        et4.setText(room.charAt(3) + "");
+                        et5.setText(room.charAt(4) + "");
+                        et6.setText(room.charAt(5) + "");
                         findViewById(R.id.create).performClick();
                     })
                     .create()
@@ -951,20 +975,20 @@ public class MainActivity extends AppCompatActivity implements RtcListener, View
         public void progress(int progress) {
             EventBus.getDefault().post(new FileUploadEvent(progress, FileUploadEvent.FILE_UPLOADING));
             Log.e("progress", progress + "%");
-            Log.e("name",Thread.currentThread().getName());
+            Log.e("name", Thread.currentThread().getName());
         }
 
         @Override
         public void failed(String error) {
             Log.e("error", error);
-            Log.e("name",Thread.currentThread().getName());
+            Log.e("name", Thread.currentThread().getName());
             EventBus.getDefault().post(new FileUploadEvent(FileUploadEvent.FILE_UPLOAD_FAILED));
         }
 
         @Override
         public void success(String path) {
             Log.e("success", path);
-            Log.e("name",Thread.currentThread().getName());
+            Log.e("name", Thread.currentThread().getName());
             EventBus.getDefault().post(new FileUploadEvent(FileUploadEvent.FILE_UPLOAD_SUCCESS));
         }
     };

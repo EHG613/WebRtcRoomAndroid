@@ -414,7 +414,28 @@ public class WebRtcClient {
         }
         return mirrors;
     }
+    public void remoteShare() {
+        if (mVideoCapturer != null) {
+            try {
+                p2p("remoteshare", Role.PC);
+                mVideoCapturer.stopCapture();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
+
+    public void remoteShareClose() {
+        if (mVideoCapturer != null) {
+            try {
+                p2p("remoteshareclose", Role.PC);
+                mVideoCapturer.stopCapture();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     /**
      * 共享桌面
      */

@@ -13,7 +13,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
     <application
         android:name=".openlive.AgoraApplication"
         android:allowBackup="true"
@@ -29,11 +31,13 @@
         </activity>
         <activity
             android:name=".openlive.activities.LiveActivity"
+            android:configChanges="orientation|screenSize"
             android:screenOrientation="landscape">
 
         </activity>
         <activity
             android:name=".openlive.activities.RoleActivity"
+            android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
